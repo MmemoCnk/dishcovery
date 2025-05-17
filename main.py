@@ -508,19 +508,18 @@ with col1:
         # Directly inject the HTML without using st.write inside
         st.markdown(favorites_html, unsafe_allow_html=True)
         
-        # Recommendations section - using pure HTML
+        # Recommendations section - using pure HTML but avoiding table tags
         recommendations_html = '<div class="orange-container"><div class="orange-header"><h2>Recommendation</h2></div><div class="white-box">'
         
-        # Add table directly in HTML
-        recommendations_html += '<table style="width: 100%;">'
+        # Use div for layout instead of table
         for rec in recommendations:
             recommendations_html += f'''
-            <tr>
-                <td style="padding: 5px 0;">{rec['name']}</td>
-                <td style="text-align: right; color: green;">{rec['score']}</td>
-            </tr>
+            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                <div>{rec['name']}</div>
+                <div style="color: green;">{rec['score']}</div>
+            </div>
             '''
-        recommendations_html += '</table></div></div>'
+        recommendations_html += '</div></div>'
         
         # Directly inject the HTML
         st.markdown(recommendations_html, unsafe_allow_html=True)
