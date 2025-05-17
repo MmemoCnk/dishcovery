@@ -467,74 +467,70 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Favorite Dishes section - fix to match required design
+        # Favorite Dishes section - same approach as successful Recommendation
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Favorite Dishes</h2>
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Favorite Dishes
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px; border: 2px solid #e17a54;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Pad Thai</span>
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Pad Thai
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Green Curry</span>
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Green Curry
                 </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
         
-        # Recommendation section - fix to match required design
+        # Recommendation section - direct HTML approach
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Recommendation</h2>
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Recommendation
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px; border: 2px solid #e17a54;">
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Omelette (new)</span>
-                    <span style="color: green !important;">100</span>
+                    <span>Omelette (new)</span>
+                    <span style="color: green;">100</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Fries Pork with Garlic</span>
-                    <span style="color: green !important;">99</span>
+                    <span>Fries Pork with Garlic</span>
+                    <span style="color: green;">99</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Som Tam</span>
-                    <span style="color: green !important;">80</span>
+                    <span>Som Tam</span>
+                    <span style="color: green;">80</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Satay</span>
-                    <span style="color: green !important;">30</span>
+                    <span>Satay</span>
+                    <span style="color: green;">30</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">test1</span>
-                    <span style="color: green !important;">30</span>
+                    <span>test1</span>
+                    <span style="color: green;">30</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">test2</span>
-                    <span style="color: green !important;">30</span>
+                    <span>test2</span>
+                    <span style="color: green;">30</span>
                 </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
         
-        # Allergic Food section - fix to match required design
+        # Allergic Food section - same approach as successful Recommendation
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Allergic Food</h2>
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Allergic Food
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px; border: 2px solid #e17a54;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Peanuts</span>
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Peanuts
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Shellfish</span>
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Shellfish
                 </div>
             </div>
         </div>
@@ -543,233 +539,70 @@ with col1:
 with col2:
     # Welcome banner
     if st.session_state.is_authenticated and st.session_state.user_data:
-        welcome_text = f"Welcome test1 test2"
+        welcome_text = f"Welcome {st.session_state.user_data['firstName']} {st.session_state.user_data['lastName']}"
     else:
         welcome_text = "Welcome"
     st.markdown(f'<div class="welcome-banner">{welcome_text}</div>', unsafe_allow_html=True)
     
-    # Create a container for the entire Main Menu section with full background
-    st.markdown("""
-    <style>
-    .menu-container {
-        background-color: #f0f2f6; 
-        border-radius: 10px;
-        width: 100%;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .menu-title {
-        color: #424242;
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-    .search-box {
-        background-color: white;
-        border-radius: 30px;
-        padding: 10px 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-    }
-    .search-icon {
-        color: #909090;
-        margin-right: 10px;
-    }
-    .category-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-    .category-button {
-        background-color: white;
-        border-radius: 30px;
-        padding: 8px 15px;
-        border: none;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-    .category-icon {
-        color: #909090;
-        margin-right: 8px;
-        font-size: 14px;
-    }
-    /* Hide Streamlit buttons but keep them functional */
-    .hidden-buttons button {
-        height: 1px;
-        width: 1px;
-        opacity: 0.1;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-    }
-    </style>
+    # Main Menu header
+    st.markdown('<h2>Main Menu</h2>', unsafe_allow_html=True)
     
-    <div class="menu-container">
-        <div class="menu-title">Main Menu</div>
-        
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            Search
-        </div>
-        
-        <div class="category-buttons">
-            <button id="category-main-dishes" class="category-button">
-                <span class="category-icon">🍽️</span>
-                Main Dishes
-            </button>
-            <button id="category-soup" class="category-button">
-                <span class="category-icon">🍲</span>
-                Soup
-            </button>
-            <button id="category-appetizers" class="category-button">
-                <span class="category-icon">🥗</span>
-                Appetizers
-            </button>
-            <button id="category-desserts" class="category-button">
-                <span class="category-icon">🍰</span>
-                Desserts
-            </button>
-            <button id="category-drinks" class="category-button">
-                <span class="category-icon">🥤</span>
-                Drinks
-            </button>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # HIDDEN Functional elements - we'll use a flat structure without nested columns
-    # Search functionality
-    search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query, 
-                                key="hidden_search", label_visibility="collapsed")
+    # Search bar
+    search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query)
     if search_query != st.session_state.search_query:
         st.session_state.search_query = search_query
         st.experimental_rerun()
     
-    # Hidden category buttons - use CSS to hide them
-    st.markdown('<div class="hidden-buttons">', unsafe_allow_html=True)
+    # Category tabs with less spacing
+    st.markdown('<div class="category-container" style="display: flex; gap: 5px; margin-bottom: 1rem;">', unsafe_allow_html=True)
+    cols = st.columns(len(categories))
     for i, category in enumerate(categories):
-        if st.button(category["name"], key=f"category_{category['id']}"):
-            st.session_state.active_category = category["id"]
-            st.experimental_rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # JavaScript to connect the visual buttons to the hidden buttons
-    st.markdown("""
-    <script>
-    // Wait for the DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Connect the Main Dishes button
-        document.getElementById('category-main-dishes').addEventListener('click', function() {
-            document.querySelector('button[key="category_main"]').click();
-        });
-        
-        // Connect the Soup button
-        document.getElementById('category-soup').addEventListener('click', function() {
-            document.querySelector('button[key="category_soup"]').click();
-        });
-        
-        // Connect the Appetizers button
-        document.getElementById('category-appetizers').addEventListener('click', function() {
-            document.querySelector('button[key="category_appetizers"]').click();
-        });
-        
-        // Connect the Desserts button
-        document.getElementById('category-desserts').addEventListener('click', function() {
-            document.querySelector('button[key="category_desserts"]').click();
-        });
-        
-        // Connect the Drinks button
-        document.getElementById('category-drinks').addEventListener('click', function() {
-            document.querySelector('button[key="category_drinks"]').click();
-        });
-    });
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # Display menu items in white cards on gray background
-    for i, item in enumerate(filtered_items):
-        # Create a white card container on gray background
-        st.markdown(f'''
-        <div style="background-color: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center;">
-            <div style="flex: 0 0 80px; margin-right: 15px;">
-                <img src="{item['image']}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
-            </div>
-            <div style="flex: 1;">
-                <h3 style="font-size: 22px; margin-bottom: 5px; color: #333;">{item['name']}</h3>
-                <p style="color: #666;">฿{item['price']}</p>
-            </div>
-            <div style="text-align: right;">
-                <div style="margin-bottom: 10px;">Quantity: {get_item_quantity(item['id'])}</div>
-                <div style="display: flex; align-items: center; justify-content: flex-end;">
-                    <button id="minus-{item['id']}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 5px; background-color: white; border: 1px solid #ddd; cursor: pointer;">-</button>
-                    <button id="plus-{item['id']}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: white; border: 1px solid #e17a54; color: #e17a54; cursor: pointer;">+</button>
-                </div>
-                <div style="margin-top: 10px;">
-                    <button id="view-{item['id']}" style="padding: 5px 10px; border-radius: 5px; background-color: white; border: 1px solid #ddd; cursor: pointer;">View Details</button>
-                </div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-    
-    # Now create a hidden container for the buttons
-    st.markdown('<div class="hidden-buttons">', unsafe_allow_html=True)
-    # For each menu item, create hidden buttons
-    for item in filtered_items:
-        # Minus button
-        if st.button("-", key=f"minus_{item['id']}"):
-            quantity = get_item_quantity(item["id"])
-            if quantity > 0:
-                update_cart_quantity(item["id"], quantity - 1)
+        with cols[i]:
+            if st.button(category["name"], key=f"category_{category['id']}", help=category["name"]):
+                st.session_state.active_category = category["id"]
                 st.experimental_rerun()
-        
-        # Plus button
-        if st.button("+", key=f"plus_{item['id']}"):
-            add_to_cart(item)
-            st.experimental_rerun()
-        
-        # View details button
-        if st.button("View", key=f"view_{item['id']}"):
-            st.session_state.show_food_dialog = True
-            st.session_state.selected_food = item
-            st.experimental_rerun()
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Filter menu items
+    filtered_items = filter_menu_items()
+    
+    # Display menu items
+    for item in filtered_items:
+        menu_card = st.container()
+        with menu_card:
+            cols = st.columns([1, 3, 1])
             
-    # JavaScript to connect the visible buttons to the hidden buttons
-    st.markdown("""
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Connect all minus buttons
-        document.querySelectorAll('[id^="minus-"]').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const itemId = this.id.replace('minus-', '');
-                document.querySelector(`button[key="minus_${itemId}"]`).click();
-            });
-        });
-        
-        // Connect all plus buttons
-        document.querySelectorAll('[id^="plus-"]').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const itemId = this.id.replace('plus-', '');
-                document.querySelector(`button[key="plus_${itemId}"]`).click();
-            });
-        });
-        
-        // Connect all view buttons
-        document.querySelectorAll('[id^="view-"]').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const itemId = this.id.replace('view-', '');
-                document.querySelector(`button[key="view_${itemId}"]`).click();
-            });
-        });
-    });
-    </script>
-    """, unsafe_allow_html=True)
+            with cols[0]:
+                st.image(item["image"], width=100)
+            
+            with cols[1]:
+                st.write(f"### {item['name']}")
+                st.write(f"฿{item['price']}")
+            
+            with cols[2]:
+                quantity = get_item_quantity(item["id"])
+                
+                # Display quantity controls in a horizontal layout
+                st.write(f"Quantity: {quantity}")
+                
+                minus_btn = st.button("-", key=f"minus_{item['id']}")
+                if minus_btn:
+                    if quantity > 0:
+                        update_cart_quantity(item["id"], quantity - 1)
+                        st.experimental_rerun()
+                
+                plus_btn = st.button("+", key=f"plus_{item['id']}")
+                if plus_btn:
+                    # When clicking +, add directly to cart
+                    add_to_cart(item)
+                    st.experimental_rerun()
+                
+                # Clicking the item area should open dialog
+                view_btn = st.button("View Details", key=f"view_{item['id']}")
+                if view_btn:
+                    st.session_state.show_food_dialog = True
+                    st.session_state.selected_food = item
+                    st.experimental_rerun()
 
     # Food dialog
     if st.session_state.show_food_dialog and st.session_state.selected_food:
