@@ -599,6 +599,15 @@ with col2:
         margin-right: 8px;
         font-size: 14px;
     }
+    /* Hide Streamlit buttons but keep them functional */
+    .hidden-buttons button {
+        height: 1px;
+        width: 1px;
+        opacity: 0.1;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
     </style>
     
     <div class="menu-container">
@@ -610,23 +619,23 @@ with col2:
         </div>
         
         <div class="category-buttons">
-            <button class="category-button">
+            <button id="category-main-dishes" class="category-button">
                 <span class="category-icon">🍽️</span>
                 Main Dishes
             </button>
-            <button class="category-button">
+            <button id="category-soup" class="category-button">
                 <span class="category-icon">🍲</span>
                 Soup
             </button>
-            <button class="category-button">
+            <button id="category-appetizers" class="category-button">
                 <span class="category-icon">🥗</span>
                 Appetizers
             </button>
-            <button class="category-button">
+            <button id="category-desserts" class="category-button">
                 <span class="category-icon">🍰</span>
                 Desserts
             </button>
-            <button class="category-button">
+            <button id="category-drinks" class="category-button">
                 <span class="category-icon">🥤</span>
                 Drinks
             </button>
@@ -635,17 +644,53 @@ with col2:
     """, unsafe_allow_html=True)
     
     # HIDDEN Functional elements - we'll use a flat structure without nested columns
+    # Search functionality
     search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query, 
                                 key="hidden_search", label_visibility="collapsed")
     if search_query != st.session_state.search_query:
         st.session_state.search_query = search_query
         st.experimental_rerun()
-        
-    # Use a single row of buttons instead of columns
+    
+    # Hidden category buttons - use CSS to hide them
+    st.markdown('<div class="hidden-buttons">', unsafe_allow_html=True)
     for i, category in enumerate(categories):
-        if st.button(category["name"], key=f"category_{category['id']}", label_visibility="collapsed"):
+        if st.button(category["name"], key=f"category_{category['id']}"):
             st.session_state.active_category = category["id"]
             st.experimental_rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # JavaScript to connect the visual buttons to the hidden buttons
+    st.markdown("""
+    <script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Connect the Main Dishes button
+        document.getElementById('category-main-dishes').addEventListener('click', function() {
+            document.querySelector('button[key="category_main"]').click();
+        });
+        
+        // Connect the Soup button
+        document.getElementById('category-soup').addEventListener('click', function() {
+            document.querySelector('button[key="category_soup"]').click();
+        });
+        
+        // Connect the Appetizers button
+        document.getElementById('category-appetizers').addEventListener('click', function() {
+            document.querySelector('button[key="category_appetizers"]').click();
+        });
+        
+        // Connect the Desserts button
+        document.getElementById('category-desserts').addEventListener('click', function() {
+            document.querySelector('button[key="category_desserts"]').click();
+        });
+        
+        // Connect the Drinks button
+        document.getElementById('category-drinks').addEventListener('click', function() {
+            document.querySelector('button[key="category_drinks"]').click();
+        });
+    });
+    </script>
+    """, unsafe_allow_html=True)
     
     # Display menu items in white cards on gray background
     for i, item in enumerate(filtered_items):
@@ -671,59 +716,56 @@ with col2:
             </div>
         </div>
         ''', unsafe_allow_html=True)
-        
-    # Now create a flat structure of buttons (no nested columns)
-    # We just render them one after another, but make them invisible with CSS
+    
+    # Now create a hidden container for the buttons
+    st.markdown('<div class="hidden-buttons">', unsafe_allow_html=True)
+    # For each menu item, create hidden buttons
     for item in filtered_items:
         # Minus button
-        if st.button("-", key=f"minus_{item['id']}", label_visibility="collapsed"):
+        if st.button("-", key=f"minus_{item['id']}"):
             quantity = get_item_quantity(item["id"])
             if quantity > 0:
                 update_cart_quantity(item["id"], quantity - 1)
                 st.experimental_rerun()
         
         # Plus button
-        if st.button("+", key=f"plus_{item['id']}", label_visibility="collapsed"):
+        if st.button("+", key=f"plus_{item['id']}"):
             add_to_cart(item)
             st.experimental_rerun()
         
         # View details button
-        if st.button("View", key=f"view_{item['id']}", label_visibility="collapsed"):
+        if st.button("View", key=f"view_{item['id']}"):
             st.session_state.show_food_dialog = True
             st.session_state.selected_food = item
             st.experimental_rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
             
-    # Custom CSS to hide the buttons
+    # JavaScript to connect the visible buttons to the hidden buttons
     st.markdown("""
-    <style>
-    /* Hide buttons but keep them functional */
-    button[key^="minus_"], button[key^="plus_"], button[key^="view_"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-    </style>
-    
     <script>
-    // Add event listeners to our custom buttons
-    document.querySelectorAll('[id^="minus-"]').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.id.replace('minus-', '');
-            document.querySelector(`button[key="minus_${itemId}"]`).click();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Connect all minus buttons
+        document.querySelectorAll('[id^="minus-"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const itemId = this.id.replace('minus-', '');
+                document.querySelector(`button[key="minus_${itemId}"]`).click();
+            });
         });
-    });
-    
-    document.querySelectorAll('[id^="plus-"]').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.id.replace('plus-', '');
-            document.querySelector(`button[key="plus_${itemId}"]`).click();
+        
+        // Connect all plus buttons
+        document.querySelectorAll('[id^="plus-"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const itemId = this.id.replace('plus-', '');
+                document.querySelector(`button[key="plus_${itemId}"]`).click();
+            });
         });
-    });
-    
-    document.querySelectorAll('[id^="view-"]').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.id.replace('view-', '');
-            document.querySelector(`button[key="view_${itemId}"]`).click();
+        
+        // Connect all view buttons
+        document.querySelectorAll('[id^="view-"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const itemId = this.id.replace('view-', '');
+                document.querySelector(`button[key="view_${itemId}"]`).click();
+            });
         });
     });
     </script>
