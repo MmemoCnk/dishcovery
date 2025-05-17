@@ -467,70 +467,74 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Favorite Dishes section - same approach as successful Recommendation
+        # Favorite Dishes section - solid HTML with explicit colors
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                Favorite Dishes
+            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Favorite Dishes</h2>
             </div>
-            <div style="background-color: white; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Pad Thai
+            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
+                    <span style="margin-right: 10px; color: black !important;">•</span>
+                    <span style="color: black !important;">Pad Thai</span>
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Green Curry
+                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
+                    <span style="margin-right: 10px; color: black !important;">•</span>
+                    <span style="color: black !important;">Green Curry</span>
                 </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
         
-        # Recommendation section - direct HTML approach
+        # Recommendation section - direct HTML approach with explicit colors
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                Recommendation
+            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Recommendation</h2>
             </div>
-            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Omelette (new)</span>
-                    <span style="color: green;">100</span>
+                    <span style="color: black !important;">Omelette (new)</span>
+                    <span style="color: green !important;">100</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Fries Pork with Garlic</span>
-                    <span style="color: green;">99</span>
+                    <span style="color: black !important;">Fries Pork with Garlic</span>
+                    <span style="color: green !important;">99</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Som Tam</span>
-                    <span style="color: green;">80</span>
+                    <span style="color: black !important;">Som Tam</span>
+                    <span style="color: green !important;">80</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Satay</span>
-                    <span style="color: green;">30</span>
+                    <span style="color: black !important;">Satay</span>
+                    <span style="color: green !important;">30</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>test1</span>
-                    <span style="color: green;">30</span>
+                    <span style="color: black !important;">test1</span>
+                    <span style="color: green !important;">30</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>test2</span>
-                    <span style="color: green;">30</span>
+                    <span style="color: black !important;">test2</span>
+                    <span style="color: green !important;">30</span>
                 </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
         
-        # Allergic Food section - same approach as successful Recommendation
+        # Allergic Food section - direct HTML with explicit colors
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                Allergic Food
+            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Allergic Food</h2>
             </div>
-            <div style="background-color: white; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Peanuts
+            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
+                    <span style="margin-right: 10px; color: black !important;">•</span>
+                    <span style="color: black !important;">Peanuts</span>
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Shellfish
+                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
+                    <span style="margin-right: 10px; color: black !important;">•</span>
+                    <span style="color: black !important;">Shellfish</span>
                 </div>
             </div>
         </div>
