@@ -548,33 +548,40 @@ with col2:
         welcome_text = "Welcome"
     st.markdown(f'<div class="welcome-banner">{welcome_text}</div>', unsafe_allow_html=True)
     
-    # Main Menu header with gray container
-    st.markdown('<div style="background-color: #f5f5f5; border-radius: 10px; padding: 15px; margin-bottom: 20px;">', unsafe_allow_html=True)
-    st.markdown('<h2 style="margin-bottom: 15px;">Main Menu</h2>', unsafe_allow_html=True)
+    # Main Menu section with full visible border (all sides)
+    st.markdown('''
+    <div style="background-color: #f5f5f5; border-radius: 10px; padding: 15px; margin-bottom: 20px; border: 1px solid #e0e0e0; width: 100%; box-sizing: border-box;">
+        <h2 style="margin-bottom: 15px;">Main Menu</h2>
+        
+        <div style="margin-bottom: 15px;">
+            <input type="text" placeholder="Search menu..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #e0e0e0; background-color: #f9f9f9;">
+        </div>
+        
+        <div style="display: flex; gap: 5px; margin: 10px 0; justify-content: flex-start; overflow-x: auto;">
+            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">All</button>
+            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Main Dishes</button>
+            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Appetizers</button>
+            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Desserts</button>
+            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Drinks</button>
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
     
-    # Search bar
-    search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query)
-    if search_query != st.session_state.search_query:
-        st.session_state.search_query = search_query
-        st.experimental_rerun()
-    
-    # Category tabs with less spacing in a compact container
-    st.markdown('<div style="display: flex; gap: 2px; margin: 10px 0; justify-content: flex-start;">', unsafe_allow_html=True)
-    
-    # Create a row with all category tabs close together
-    col_widths = [1] * len(categories)  # Equal width for all columns
-    cols = st.columns(col_widths)
-    
-    for i, category in enumerate(categories):
-        with cols[i]:
-            if st.button(category["name"], key=f"category_{category['id']}", help=category["name"]):
-                st.session_state.active_category = category["id"]
-                st.experimental_rerun()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Close the main menu container
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Hidden search and category elements (for functionality)
+    with st.container():
+        st.write("")  # Placeholder
+        search_query = st.text_input("", placeholder="", value=st.session_state.search_query, key="hidden_search", label_visibility="collapsed")
+        if search_query != st.session_state.search_query:
+            st.session_state.search_query = search_query
+            st.experimental_rerun()
+        
+        # Hidden buttons for functionality
+        cols = st.columns(len(categories))
+        for i, category in enumerate(categories):
+            with cols[i]:
+                if st.button("", key=f"category_{category['id']}", label_visibility="collapsed"):
+                    st.session_state.active_category = category["id"]
+                    st.experimental_rerun()
     
     # Filter menu items
     filtered_items = filter_menu_items()
