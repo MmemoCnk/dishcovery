@@ -508,20 +508,40 @@ with col1:
             
         st.markdown('</div></div>', unsafe_allow_html=True)
         
-        # Recommendation section
-        st.markdown('<div class="orange-section">', unsafe_allow_html=True)
-        st.markdown('<div class="orange-header">Recommendation</div>', unsafe_allow_html=True)
-        st.markdown('<div class="white-box">', unsafe_allow_html=True)
-        
-        # Content inside white box
-        for rec in recommendations:
-            cols = st.columns([3, 1])
-            with cols[0]:
-                st.write(rec["name"])
-            with cols[1]:
-                st.markdown(f'<p style="text-align: right; color: green;">{rec["score"]}</p>', unsafe_allow_html=True)
-            
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        # Recommendation section - direct HTML approach
+        st.markdown('''
+        <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Recommendation
+            </div>
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                    <span>Omelette (new)</span>
+                    <span style="color: green;">100</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                    <span>Fries Pork with Garlic</span>
+                    <span style="color: green;">99</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                    <span>Som Tam</span>
+                    <span style="color: green;">80</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                    <span>Satay</span>
+                    <span style="color: green;">30</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                    <span>test1</span>
+                    <span style="color: green;">30</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                    <span>test2</span>
+                    <span style="color: green;">30</span>
+                </div>
+            </div>
+        </div>
+        ''', unsafe_allow_html=True)
         
         # Allergic Food section
         st.markdown('<div class="orange-section">', unsafe_allow_html=True)
