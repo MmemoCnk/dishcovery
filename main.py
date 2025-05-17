@@ -538,7 +538,10 @@ with col1:
 
 with col2:
     # Welcome banner
-    welcome_text = f"Welcome, {st.session_state.user_data['firstName'] if st.session_state.is_authenticated else 'Guest'}"
+    if st.session_state.is_authenticated and st.session_state.user_data:
+        welcome_text = f"Welcome {st.session_state.user_data['firstName']} {st.session_state.user_data['lastName']}"
+    else:
+        welcome_text = "Welcome"
     st.markdown(f'<div class="welcome-banner">{welcome_text}</div>', unsafe_allow_html=True)
     
     # Main Menu header
@@ -550,12 +553,12 @@ with col2:
         st.session_state.search_query = search_query
         st.experimental_rerun()
     
-    # Category tabs
-    st.markdown('<div style="margin-bottom: 1rem;">', unsafe_allow_html=True)
+    # Category tabs with less spacing
+    st.markdown('<div class="category-container" style="display: flex; gap: 5px; margin-bottom: 1rem;">', unsafe_allow_html=True)
     cols = st.columns(len(categories))
     for i, category in enumerate(categories):
         with cols[i]:
-            if st.button(category["name"], key=f"category_{category['id']}"):
+            if st.button(category["name"], key=f"category_{category['id']}", help=category["name"]):
                 st.session_state.active_category = category["id"]
                 st.experimental_rerun()
     st.markdown('</div>', unsafe_allow_html=True)
