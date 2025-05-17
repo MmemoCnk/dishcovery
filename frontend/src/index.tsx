@@ -1,13 +1,13 @@
-// src/index.tsx - Entry point ของแอพพลิเคชัน React
-
 import React from "react";
-import ReactDOM from "react-dom";
-import DishcoveryApp from "./DishcoveryApp";
+import ReactDOM from "react-dom/client";
 import "./index.css";
+import DishcoveryApp from "./DishcoveryApp";
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(
+  document.getElementById("root") as HTMLElement
+);
+root.render(
   <React.StrictMode>
     <DishcoveryApp />
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
