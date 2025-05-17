@@ -548,81 +548,186 @@ with col2:
         welcome_text = "Welcome"
     st.markdown(f'<div class="welcome-banner">{welcome_text}</div>', unsafe_allow_html=True)
     
-    # Main Menu section with full visible border (all sides)
-    st.markdown('''
-    <div style="background-color: #f5f5f5; border-radius: 10px; padding: 15px; margin-bottom: 20px; border: 1px solid #e0e0e0; width: 100%; box-sizing: border-box;">
-        <h2 style="margin-bottom: 15px;">Main Menu</h2>
+    # Create a container for the entire Main Menu section with full background
+    st.markdown("""
+    <style>
+    .menu-container {
+        background-color: #f0f2f6; 
+        border-radius: 10px;
+        width: 100%;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .menu-title {
+        color: #424242;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .search-box {
+        background-color: white;
+        border-radius: 30px;
+        padding: 10px 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+    }
+    .search-icon {
+        color: #909090;
+        margin-right: 10px;
+    }
+    .category-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .category-button {
+        background-color: white;
+        border-radius: 30px;
+        padding: 8px 15px;
+        border: none;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    .category-icon {
+        color: #909090;
+        margin-right: 8px;
+        font-size: 14px;
+    }
+    </style>
+    
+    <div class="menu-container">
+        <div class="menu-title">Main Menu</div>
         
-        <div style="margin-bottom: 15px;">
-            <input type="text" placeholder="Search menu..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #e0e0e0; background-color: #f9f9f9;">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            Search
         </div>
         
-        <div style="display: flex; gap: 5px; margin: 10px 0; justify-content: flex-start; overflow-x: auto;">
-            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">All</button>
-            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Main Dishes</button>
-            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Appetizers</button>
-            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Desserts</button>
-            <button style="background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; padding: 6px 12px; min-width: 70px; cursor: pointer; margin-right: 2px;">Drinks</button>
+        <div class="category-buttons">
+            <button class="category-button">
+                <span class="category-icon">🍽️</span>
+                Main Dishes
+            </button>
+            <button class="category-button">
+                <span class="category-icon">🍲</span>
+                Soup
+            </button>
+            <button class="category-button">
+                <span class="category-icon">🥗</span>
+                Appetizers
+            </button>
+            <button class="category-button">
+                <span class="category-icon">🍰</span>
+                Desserts
+            </button>
+            <button class="category-button">
+                <span class="category-icon">🥤</span>
+                Drinks
+            </button>
         </div>
     </div>
-    ''', unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     
-    # Hidden search and category elements (for functionality)
-    with st.container():
-        st.write("")  # Placeholder
-        search_query = st.text_input("", placeholder="", value=st.session_state.search_query, key="hidden_search", label_visibility="collapsed")
-        if search_query != st.session_state.search_query:
-            st.session_state.search_query = search_query
+    # HIDDEN Functional elements - we'll use a flat structure without nested columns
+    search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query, 
+                                key="hidden_search", label_visibility="collapsed")
+    if search_query != st.session_state.search_query:
+        st.session_state.search_query = search_query
+        st.experimental_rerun()
+        
+    # Use a single row of buttons instead of columns
+    for i, category in enumerate(categories):
+        if st.button(category["name"], key=f"category_{category['id']}", label_visibility="collapsed"):
+            st.session_state.active_category = category["id"]
+            st.experimental_rerun()
+    
+    # Display menu items in white cards on gray background
+    for i, item in enumerate(filtered_items):
+        # Create a white card container on gray background
+        st.markdown(f'''
+        <div style="background-color: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center;">
+            <div style="flex: 0 0 80px; margin-right: 15px;">
+                <img src="{item['image']}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 22px; margin-bottom: 5px; color: #333;">{item['name']}</h3>
+                <p style="color: #666;">฿{item['price']}</p>
+            </div>
+            <div style="text-align: right;">
+                <div style="margin-bottom: 10px;">Quantity: {get_item_quantity(item['id'])}</div>
+                <div style="display: flex; align-items: center; justify-content: flex-end;">
+                    <button id="minus-{item['id']}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 5px; background-color: white; border: 1px solid #ddd; cursor: pointer;">-</button>
+                    <button id="plus-{item['id']}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: white; border: 1px solid #e17a54; color: #e17a54; cursor: pointer;">+</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button id="view-{item['id']}" style="padding: 5px 10px; border-radius: 5px; background-color: white; border: 1px solid #ddd; cursor: pointer;">View Details</button>
+                </div>
+            </div>
+        </div>
+        ''', unsafe_allow_html=True)
+        
+    # Now create a flat structure of buttons (no nested columns)
+    # We just render them one after another, but make them invisible with CSS
+    for item in filtered_items:
+        # Minus button
+        if st.button("-", key=f"minus_{item['id']}", label_visibility="collapsed"):
+            quantity = get_item_quantity(item["id"])
+            if quantity > 0:
+                update_cart_quantity(item["id"], quantity - 1)
+                st.experimental_rerun()
+        
+        # Plus button
+        if st.button("+", key=f"plus_{item['id']}", label_visibility="collapsed"):
+            add_to_cart(item)
             st.experimental_rerun()
         
-        # Hidden buttons for functionality
-        cols = st.columns(len(categories))
-        for i, category in enumerate(categories):
-            with cols[i]:
-                if st.button("", key=f"category_{category['id']}", label_visibility="collapsed"):
-                    st.session_state.active_category = category["id"]
-                    st.experimental_rerun()
+        # View details button
+        if st.button("View", key=f"view_{item['id']}", label_visibility="collapsed"):
+            st.session_state.show_food_dialog = True
+            st.session_state.selected_food = item
+            st.experimental_rerun()
+            
+    # Custom CSS to hide the buttons
+    st.markdown("""
+    <style>
+    /* Hide buttons but keep them functional */
+    button[key^="minus_"], button[key^="plus_"], button[key^="view_"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    </style>
     
-    # Filter menu items
-    filtered_items = filter_menu_items()
+    <script>
+    // Add event listeners to our custom buttons
+    document.querySelectorAll('[id^="minus-"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.id.replace('minus-', '');
+            document.querySelector(`button[key="minus_${itemId}"]`).click();
+        });
+    });
     
-    # Display menu items
-    for item in filtered_items:
-        menu_card = st.container()
-        with menu_card:
-            cols = st.columns([1, 3, 1])
-            
-            with cols[0]:
-                st.image(item["image"], width=100)
-            
-            with cols[1]:
-                st.write(f"### {item['name']}")
-                st.write(f"฿{item['price']}")
-            
-            with cols[2]:
-                quantity = get_item_quantity(item["id"])
-                
-                # Display quantity controls in a horizontal layout
-                st.write(f"Quantity: {quantity}")
-                
-                minus_btn = st.button("-", key=f"minus_{item['id']}")
-                if minus_btn:
-                    if quantity > 0:
-                        update_cart_quantity(item["id"], quantity - 1)
-                        st.experimental_rerun()
-                
-                plus_btn = st.button("+", key=f"plus_{item['id']}")
-                if plus_btn:
-                    # When clicking +, add directly to cart
-                    add_to_cart(item)
-                    st.experimental_rerun()
-                
-                # Clicking the item area should open dialog
-                view_btn = st.button("View Details", key=f"view_{item['id']}")
-                if view_btn:
-                    st.session_state.show_food_dialog = True
-                    st.session_state.selected_food = item
-                    st.experimental_rerun()
+    document.querySelectorAll('[id^="plus-"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.id.replace('plus-', '');
+            document.querySelector(`button[key="plus_${itemId}"]`).click();
+        });
+    });
+    
+    document.querySelectorAll('[id^="view-"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.id.replace('view-', '');
+            document.querySelector(`button[key="view_${itemId}"]`).click();
+        });
+    });
+    </script>
+    """, unsafe_allow_html=True)
 
     # Food dialog
     if st.session_state.show_food_dialog and st.session_state.selected_food:
