@@ -467,13 +467,13 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Favorite Dishes section - solid HTML with explicit colors
+        # Favorite Dishes section - fix to match required design
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
                 <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Favorite Dishes</h2>
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
+            <div style="background-color: white !important; border-radius: 10px; padding: 15px; border: 2px solid #e17a54;">
                 <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
                     <span style="margin-right: 10px; color: black !important;">•</span>
                     <span style="color: black !important;">Pad Thai</span>
@@ -486,13 +486,13 @@ with col1:
         </div>
         ''', unsafe_allow_html=True)
         
-        # Recommendation section - direct HTML approach with explicit colors
+        # Recommendation section - fix to match required design
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
                 <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Recommendation</h2>
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
+            <div style="background-color: white !important; border-radius: 10px; padding: 15px; border: 2px solid #e17a54;">
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
                     <span style="color: black !important;">Omelette (new)</span>
                     <span style="color: green !important;">100</span>
@@ -521,13 +521,13 @@ with col1:
         </div>
         ''', unsafe_allow_html=True)
         
-        # Allergic Food section - direct HTML with explicit colors
+        # Allergic Food section - fix to match required design
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
                 <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Allergic Food</h2>
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
+            <div style="background-color: white !important; border-radius: 10px; padding: 15px; border: 2px solid #e17a54;">
                 <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
                     <span style="margin-right: 10px; color: black !important;">•</span>
                     <span style="color: black !important;">Peanuts</span>
@@ -543,13 +543,14 @@ with col1:
 with col2:
     # Welcome banner
     if st.session_state.is_authenticated and st.session_state.user_data:
-        welcome_text = f"Welcome {st.session_state.user_data['firstName']} {st.session_state.user_data['lastName']}"
+        welcome_text = f"Welcome test1 test2"
     else:
         welcome_text = "Welcome"
     st.markdown(f'<div class="welcome-banner">{welcome_text}</div>', unsafe_allow_html=True)
     
-    # Main Menu header
-    st.markdown('<h2>Main Menu</h2>', unsafe_allow_html=True)
+    # Main Menu header with gray container
+    st.markdown('<div style="background-color: #f5f5f5; border-radius: 10px; padding: 15px; margin-bottom: 20px;">', unsafe_allow_html=True)
+    st.markdown('<h2 style="margin-bottom: 15px;">Main Menu</h2>', unsafe_allow_html=True)
     
     # Search bar
     search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query)
@@ -557,14 +558,22 @@ with col2:
         st.session_state.search_query = search_query
         st.experimental_rerun()
     
-    # Category tabs with less spacing
-    st.markdown('<div class="category-container" style="display: flex; gap: 5px; margin-bottom: 1rem;">', unsafe_allow_html=True)
-    cols = st.columns(len(categories))
+    # Category tabs with less spacing in a compact container
+    st.markdown('<div style="display: flex; gap: 2px; margin: 10px 0; justify-content: flex-start;">', unsafe_allow_html=True)
+    
+    # Create a row with all category tabs close together
+    col_widths = [1] * len(categories)  # Equal width for all columns
+    cols = st.columns(col_widths)
+    
     for i, category in enumerate(categories):
         with cols[i]:
             if st.button(category["name"], key=f"category_{category['id']}", help=category["name"]):
                 st.session_state.active_category = category["id"]
                 st.experimental_rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Close the main menu container
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Filter menu items
