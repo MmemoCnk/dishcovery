@@ -1,9 +1,12 @@
 import streamlit as st
-import streamlit.components.v1 as components
+import base64
+from PIL import Image
+import requests
+from io import BytesIO
 
 # กำหนดการตั้งค่าของหน้า
 st.set_page_config(
-    page_title="DISHCOVERY",
+    page_title="DISHCOVERY", 
     page_icon="🍜",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -15,720 +18,464 @@ hide_streamlit_style = """
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
-.css-18e3th9 {padding-top: 0;}
-.css-1d391kg {padding-top: 0;}
+section.main > div:has(~ footer ) {
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+}
+.stApp {
+    background-color: #f3f4f6;
+}
+button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+button:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: white;
+    border-radius: 5px;
+}
+.menu-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+.menu-name {
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: 500;
+}
+.menu-counter {
+    display: flex;
+    align-items: center;
+}
+.counter-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.counter-value {
+    width: 30px;
+    text-align: center;
+    font-size: 16px;
+    margin: 0 5px;
+}
+.card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.card-header {
+    background-color: #e2e8f0;
+    margin: -16px -16px 16px -16px;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+}
+.recommendation-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background-color: #f8fafc;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+.input-with-icon {
+    position: relative;
+    margin-bottom: 15px;
+}
+.input-with-icon input {
+    padding-left: 30px;
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+.search-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+.search-container input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.category-tab {
+    padding: 8px 16px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 4px;
+}
+.category-tab.active {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #4a5568;
+}
+.top-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.welcome-banner {
+    background-color: #e67e22; /* Orange */
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# ใช้เฉพาะ HTML Component แทน path-based component
-component_html = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DISHCOVERY</title>
-    <!-- React and ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <style>
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: #f3f4f6;
-        }
-        .card {
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.25rem;
-            margin-bottom: 0.75rem;
-        }
-        .button {
-            background-color: #1e293b;
-            color: white;
-            padding: 0.75rem;
-            border-radius: 0.25rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            width: 100%;
-        }
-        .button:hover {
-            background-color: #334155;
-        }
-        .card-header {
-            background-color: #e2e8f0;
-            padding: 0.5rem;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            text-align: center;
-            font-weight: 600;
-        }
-        .tab {
-            padding: 0.5rem 1rem;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            cursor: pointer;
-            text-align: center;
-        }
-        .tab-active {
-            background-color: #f8fafc;
-            border-bottom: 2px solid #334155;
-        }
-        .food-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background-color: white;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .food-image {
-            width: 4rem;
-            height: 4rem;
-            background-color: #f3f4f6;
-            margin-right: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.25rem;
-        }
-        .counter-button {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 9999px;
-            background-color: white;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .counter-button:hover {
-            background-color: #f8fafc;
-        }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
-    
-    <script>
-        // ประกาศและกำหนดตัวแปรจาก React
-        const { createElement: h, useState, useEffect, useContext, createContext } = React;
-        const { createRoot } = ReactDOM;
+# รูปภาพเมนูอาหาร - ใช้ URL สำหรับรูปภาพตัวอย่าง
+food_images = {
+    "Tom Yum Kung": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Tom_yam_kung_maenam.jpg/220px-Tom_yam_kung_maenam.jpg",
+    "Pad Thai": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Mee_Pad_Thai.jpg/250px-Mee_Pad_Thai.jpg",
+    "Rice": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/White_rice_cooked.jpg/235px-White_rice_cooked.jpg",
+    "Fresh water": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Evian_bottle.JPG/220px-Evian_bottle.JPG",
+    "Stir fried Thai basil": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Phat_kaphrao.jpg/250px-Phat_kaphrao.jpg"
+}
 
-        // สร้าง OrderContext
-        const OrderContext = createContext();
+# ข้อมูลเมนูอาหาร
+menu_items = {
+    "Main Dishes": [
+        {"name": "Tom Yum Kung", "price": 120},
+        {"name": "Pad Thai", "price": 100},
+        {"name": "Stir fried Thai basil", "price": 90}
+    ],
+    "Soup": [
+        {"name": "Chicken Soup", "price": 80},
+        {"name": "Vegetable Soup", "price": 70}
+    ],
+    "Appetizers": [],
+    "Desserts": [
+        {"name": "Mango Sticky Rice", "price": 90},
+        {"name": "Coconut Ice Cream", "price": 60}
+    ],
+    "Drinks": [
+        {"name": "Fresh water", "price": 20},
+        {"name": "Thai Milk Tea", "price": 50}
+    ]
+}
+
+# เพิ่ม "Rice" ใน Main Dishes
+rice_exists = False
+for item in menu_items["Main Dishes"]:
+    if item["name"] == "Rice":
+        rice_exists = True
+        break
         
-        // ข้อมูลเมนูอาหารตัวอย่าง
-        const menuItemsData = {
-            "Main Dishes": [
-                { name: "Tom Yum Kung", price: 120 },
-                { name: "Pad Thai", price: 100 },
-                { name: "Stir fried Thai basil", price: 90 }
-            ],
-            "Soup": [
-                { name: "Chicken Soup", price: 80 },
-                { name: "Vegetable Soup", price: 70 }
-            ],
-            "Appetizers": [],
-            "Desserts": [
-                { name: "Mango Sticky Rice", price: 90 },
-                { name: "Coconut Ice Cream", price: 60 }
-            ],
-            "Drinks": [
-                { name: "Fresh water", price: 20 },
-                { name: "Thai Milk Tea", price: 50 }
-            ]
-        };
-        
-        // ข้อมูลคำแนะนำตัวอย่าง
-        const recommendationsData = [
-            { name: "Omelette (new)", quantity: 100 },
-            { name: "Fries Pork with Garlic", quantity: 99 },
-            { name: "Som Tam", quantity: 80 },
-            { name: "Satay", quantity: 30 },
-            { name: "test1", quantity: 30 },
-            { name: "test2", quantity: 30 }
-        ];
-        
-        // ข้อมูลผู้ใช้ตัวอย่าง
-        const usersData = [
-            { 
-                id: "12345", 
-                phone: "0891234567", 
-                name: "John", 
-                surname: "Doe", 
-                favoriteDishes: ["Pad Thai", "Tom Yum"], 
-                allergicFood: ["Peanuts"] 
-            }
-        ];
+if not rice_exists:
+    menu_items["Main Dishes"].append({"name": "Rice", "price": 30})
 
-        // OrderProvider component
-        function OrderProvider({ children }) {
-            const [cart, setCart] = useState({});
-            const [activeTab, setActiveTab] = useState("All");
-            const [searchQuery, setSearchQuery] = useState("");
-            const [loggedIn, setLoggedIn] = useState(false);
-            const [currentUser, setCurrentUser] = useState(null);
-            const [checkoutSuccess, setCheckoutSuccess] = useState(false);
-            
-            // ฟังก์ชันเข้าสู่ระบบ
-            const login = (memberId, phone) => {
-                const user = usersData.find(u => u.id === memberId && u.phone === phone);
-                if (user) {
-                    setCurrentUser(user);
-                    setLoggedIn(true);
-                    return true;
-                }
-                return false;
-            };
-            
-            // เพิ่มรายการในตะกร้า
-            const addToCart = (item, remark = "") => {
-                setCart(prev => {
-                    const updatedCart = { ...prev };
-                    if (updatedCart[item.name]) {
-                        updatedCart[item.name].quantity += 1;
-                        if (remark) {
-                            updatedCart[item.name].remark = remark;
-                        }
-                    } else {
-                        updatedCart[item.name] = {
-                            ...item,
-                            quantity: 1,
-                            remark
-                        };
-                    }
-                    return updatedCart;
-                });
-            };
-            
-            // ลบรายการจากตะกร้า
-            const removeFromCart = (itemName) => {
-                setCart(prev => {
-                    const updatedCart = { ...prev };
-                    if (updatedCart[itemName] && updatedCart[itemName].quantity > 0) {
-                        updatedCart[itemName].quantity -= 1;
-                        if (updatedCart[itemName].quantity === 0) {
-                            delete updatedCart[itemName];
-                        }
-                    }
-                    return updatedCart;
-                });
-            };
-            
-            // ล้างตะกร้า
-            const clearCart = () => {
-                setCart({});
-            };
-            
-            return h(OrderContext.Provider, {
-                value: {
-                    cart,
-                    activeTab,
-                    setActiveTab,
-                    searchQuery,
-                    setSearchQuery,
-                    addToCart,
-                    removeFromCart,
-                    clearCart,
-                    login,
-                    loggedIn,
-                    currentUser,
-                    checkoutSuccess,
-                    setCheckoutSuccess
-                }
-            }, children);
-        }
+# ข้อมูลคำแนะนำ
+recommendations = [
+    {"name": "Omelette (new)", "quantity": 100},
+    {"name": "Fries Pork with Garlic", "quantity": 99},
+    {"name": "Som Tam", "quantity": 80},
+    {"name": "Satay", "quantity": 30},
+    {"name": "test1", "quantity": 30},
+    {"name": "test2", "quantity": 30}
+]
 
-        // Hook สำหรับใช้ OrderContext
-        function useOrder() {
-            return useContext(OrderContext);
-        }
+# ข้อมูลผู้ใช้ตัวอย่าง
+user_data = {
+    "id": "12345",
+    "phone": "0891234567",
+    "name": "John",
+    "surname": "Doe",
+    "favorite_dishes": ["Pad Thai", "Tom Yum"],
+    "allergic_food": ["Peanuts"]
+}
 
-        // CustomerInfo component
-        function CustomerInfo() {
-            const [memberId, setMemberId] = useState("");
-            const [phone, setPhone] = useState("");
-            const { login, loggedIn, currentUser } = useOrder();
-            const currentDate = new Date().toLocaleString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            const handleLogin = () => {
-                if (!login(memberId, phone)) {
-                    alert("Invalid credentials. Continuing as guest.");
-                }
-            };
-            
-            return h('div', { className: 'card h-full' }, [
-                h('div', { className: 'p-4' }, [
-                    !loggedIn ? h('div', { className: 'space-y-4' }, [
-                        h('h2', { className: 'text-xl font-semibold' }, 'Please Input Customer ID'),
-                        h('input', { 
-                            className: 'input', 
-                            placeholder: 'Member ID',
-                            value: memberId,
-                            onChange: (e) => setMemberId(e.target.value)
-                        }),
-                        h('input', { 
-                            className: 'input', 
-                            placeholder: 'Tel number',
-                            value: phone,
-                            onChange: (e) => setPhone(e.target.value)
-                        }),
-                        h('div', { 
-                            className: 'button', 
-                            onClick: handleLogin 
-                        }, 'Enter')
-                    ]) : null,
-                    
-                    h('div', { className: 'space-y-4 pt-4' }, [
-                        h('h2', { className: 'text-xl font-semibold' }, 'Customer Information'),
-                        h('input', { 
-                            className: 'input', 
-                            placeholder: 'Name',
-                            value: currentUser?.name || "",
-                            disabled: true
-                        }),
-                        h('input', { 
-                            className: 'input', 
-                            placeholder: 'Surname',
-                            value: currentUser?.surname || "",
-                            disabled: true
-                        }),
-                        h('input', { 
-                            className: 'input', 
-                            placeholder: 'Date & Time',
-                            value: currentDate,
-                            disabled: true
-                        })
-                    ])
-                ])
-            ]);
-        }
+# ตั้งค่าค่าเริ่มต้นใน session state
+if 'cart' not in st.session_state:
+    st.session_state.cart = {}
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'current_user' not in st.session_state:
+    st.session_state.current_user = None
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "All"
+if 'checkout_success' not in st.session_state:
+    st.session_state.checkout_success = False
 
-        // RecommendationPanel component
-        function RecommendationPanel() {
-            const { loggedIn, currentUser } = useOrder();
-            
-            return h('div', { className: 'flex flex-col gap-4' }, [
-                // Favorite Dishes card
-                h('div', { className: 'card mb-2' }, [
-                    h('div', { className: 'card-header' }, 'Favorite Dishes'),
-                    h('div', { className: 'p-4' }, 
-                        loggedIn && currentUser?.favoriteDishes ? 
-                            currentUser.favoriteDishes.map((dish, index) => 
-                                h('div', { 
-                                    key: index, 
-                                    className: 'bg-gray-50 p-3 rounded-md my-2' 
-                                }, dish)
-                            ) :
-                            h('div', { className: 'text-gray-500' }, 'No favorite dishes available')
-                    )
-                ]),
-                
-                // Recommendations card
-                h('div', { className: 'card mb-2' }, [
-                    h('div', { className: 'card-header' }, 'Recommendation'),
-                    h('div', { className: 'p-4' }, 
-                        recommendationsData.map((rec, index) => 
-                            h('div', { 
-                                key: index, 
-                                className: 'bg-gray-50 p-3 rounded-md my-2 flex justify-between' 
-                            }, [
-                                h('span', {}, rec.name),
-                                h('span', {}, rec.quantity)
-                            ])
-                        )
-                    )
-                ]),
-                
-                // Allergic Food card
-                h('div', { className: 'card' }, [
-                    h('div', { className: 'card-header' }, 'Allergic Food'),
-                    h('div', { className: 'p-4' }, 
-                        loggedIn && currentUser?.allergicFood ? 
-                            currentUser.allergicFood.map((allergen, index) => 
-                                h('div', { 
-                                    key: index, 
-                                    className: 'bg-gray-50 p-3 rounded-md my-2' 
-                                }, allergen)
-                            ) :
-                            h('div', { className: 'text-gray-500' }, 'No allergic food information available')
-                    )
-                ])
-            ]);
-        }
+# ฟังก์ชั่นสำหรับโหลดรูปภาพจาก URL
+def load_image_from_url(url):
+    try:
+        response = requests.get(url)
+        img = Image.open(BytesIO(response.content))
+        return img
+    except:
+        return Image.new('RGB', (100, 100), color = 'grey')
 
-        // ShoppingCart component
-        function ShoppingCart({ onClose }) {
-            const { cart, clearCart, setCheckoutSuccess } = useOrder();
-            
-            const totalCartPrice = Object.values(cart).reduce(
-                (sum, item) => sum + (item.price * item.quantity), 
-                0
-            );
-            
-            const handleCheckout = () => {
-                setCheckoutSuccess(true);
-                setTimeout(() => {
-                    clearCart();
-                    onClose();
-                }, 1000);
-            };
-            
-            return h('div', { className: 'card w-72 shadow-lg' }, [
-                h('div', { className: 'flex justify-between items-center p-4' }, [
-                    h('h3', { className: 'font-bold text-lg' }, 'Shopping Cart'),
-                    h('div', { 
-                        className: 'cursor-pointer', 
-                        onClick: onClose 
-                    }, 'X')
-                ]),
-                h('hr', {}),
-                h('div', { className: 'p-4 space-y-4 max-h-96 overflow-auto' }, [
-                    Object.keys(cart).length > 0 ? [
-                        ...Object.entries(cart).map(([name, item]) => 
-                            h('div', { key: name, className: 'py-1' }, [
-                                h('div', { className: 'flex justify-between' }, [
-                                    h('span', {}, `${name} x ${item.quantity}`),
-                                    h('span', {}, `฿${item.price * item.quantity}`)
-                                ]),
-                                item.remark && h('div', { 
-                                    className: 'text-sm italic text-gray-600' 
-                                }, `Remark: ${item.remark}`)
-                            ])
-                        ),
-                        h('hr', { className: 'my-2' }),
-                        h('div', { className: 'font-bold flex justify-between' }, [
-                            h('span', {}, 'Total:'),
-                            h('span', {}, `฿${totalCartPrice}`)
-                        ]),
-                        h('div', { 
-                            className: 'button mt-2', 
-                            onClick: handleCheckout 
-                        }, 'Checkout')
-                    ] : h('div', { 
-                        className: 'py-4 text-center text-gray-500' 
-                    }, 'Your cart is empty')
-                ])
-            ]);
-        }
+# ฟังก์ชั่นสำหรับสร้างปุ่ม +/-
+def create_counter(item_key):
+    quantity = st.session_state.cart.get(item_key, {}).get("quantity", 0)
+    html = f"""
+    <div class="menu-counter">
+        <button class="counter-button" onclick="decrementCounter('{item_key}')">-</button>
+        <div class="counter-value">{quantity}</div>
+        <button class="counter-button" onclick="incrementCounter('{item_key}')">+</button>
+    </div>
+    """
+    return html
 
-        // FoodMenu component
-        function FoodMenu() {
-            const { 
-                addToCart, 
-                removeFromCart,
-                cart,
-                activeTab, 
-                setActiveTab,
-                searchQuery,
-                setSearchQuery
-            } = useOrder();
-            
-            const [selectedItem, setSelectedItem] = useState(null);
-            const [remark, setRemark] = useState("");
-            
-            const handleAddToCart = (item, withRemark = false) => {
-                if (withRemark) {
-                    setSelectedItem(item);
-                    setRemark("");
-                } else {
-                    addToCart(item);
-                }
-            };
-            
-            const handleRemoveFromCart = (itemName) => {
-                removeFromCart(itemName);
-            };
-            
-            const handleSubmitRemark = () => {
-                if (selectedItem) {
-                    addToCart(selectedItem, remark);
-                    setSelectedItem(null);
-                }
-            };
-            
-            // รายการอาหารทั้งหมด
-            const allItems = Object.entries(menuItemsData).reduce((acc, [category, items]) => {
-                return [...acc, ...items];
-            }, []);
-            
-            // กรองรายการตามคำค้นหาหรือแท็บที่เลือก
-            const displayItems = searchQuery
-                ? allItems.filter(item => 
-                    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                : activeTab === "All"
-                ? allItems
-                : menuItemsData[activeTab] || [];
-            
-            // รายการแท็บทั้งหมด
-            const categoryTabs = ["All", ...Object.keys(menuItemsData)];
-            
-            return h('div', { className: 'h-full flex flex-col' }, [
-                // Search Bar
-                h('div', { className: 'mb-4 relative' }, [
-                    h('input', {
-                        className: 'input pl-8',
-                        placeholder: 'Search',
-                        value: searchQuery,
-                        onChange: (e) => setSearchQuery(e.target.value)
-                    }),
-                    h('span', { 
-                        className: 'absolute left-2 top-3 text-gray-500' 
-                    }, '🔍')
-                ]),
-                
-                // Category Tabs
-                h('div', { className: 'grid grid-cols-6 mb-4' }, 
-                    categoryTabs.map((category) => 
-                        h('div', {
-                            key: category,
-                            className: `tab ${activeTab === category ? 'tab-active' : ''}`,
-                            onClick: () => setActiveTab(category)
-                        }, category)
-                    )
-                ),
-                
-                // Food Items
-                h('div', { className: 'flex-1 overflow-auto mb-4 pr-2' }, 
-                    displayItems.map((item) => {
-                        const quantity = cart[item.name]?.quantity || 0;
-                        
-                        return h('div', { 
-                            key: item.name, 
-                            className: 'food-item',
-                            onClick: () => handleAddToCart(item, true)
-                        }, [
-                            h('div', { className: 'food-image' }, '🍽️'),
-                            h('div', { className: 'flex-1 font-medium' }, item.name),
-                            h('div', { className: 'flex items-center' }, [
-                                h('button', { 
-                                    className: 'counter-button',
-                                    onClick: (e) => {
-                                        e.stopPropagation();
-                                        handleRemoveFromCart(item.name);
-                                    },
-                                    disabled: quantity === 0
-                                }, '-'),
-                                h('span', { className: 'mx-3 w-6 text-center' }, quantity),
-                                h('button', { 
-                                    className: 'counter-button',
-                                    onClick: (e) => {
-                                        e.stopPropagation();
-                                        handleAddToCart(item);
-                                    }
-                                }, '+')
-                            ])
-                        ]);
-                    })
-                ),
-                
-                // Remark Dialog
-                selectedItem && h('div', { 
-                    className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50' 
-                }, [
-                    h('div', { className: 'bg-white rounded-md p-6 w-96' }, [
-                        h('h3', { className: 'text-lg font-semibold mb-4' }, 
-                            `Add Remark for ${selectedItem?.name}`
-                        ),
-                        h('input', {
-                            className: 'input mb-4',
-                            placeholder: 'Enter your remark here...',
-                            value: remark,
-                            onChange: (e) => setRemark(e.target.value)
-                        }),
-                        h('div', { className: 'flex justify-end space-x-2' }, [
-                            h('button', { 
-                                className: 'px-4 py-2 border rounded-md',
-                                onClick: () => setSelectedItem(null)
-                            }, 'Cancel'),
-                            h('button', { 
-                                className: 'px-4 py-2 bg-gray-800 text-white rounded-md',
-                                onClick: handleSubmitRemark
-                            }, 'Submit')
-                        ])
-                    ])
-                ])
-            ]);
-        }
+# หัวข้อหลัก
+col1, col2, col3 = st.columns([1, 4, 1])
+with col1:
+    st.markdown("<h1 style='font-size: 32px; font-weight: bold;'>DISHCOVERY</h1>", unsafe_allow_html=True)
+with col2:
+    st.markdown("<div class='welcome-banner'>Welcome</div>", unsafe_allow_html=True)
+with col3:
+    cart_count = sum(item["quantity"] for item in st.session_state.cart.values()) if st.session_state.cart else 0
+    st.markdown(f"<div style='text-align: right; font-size: 28px;'>🛒</div>", unsafe_allow_html=True)
 
-        // App component หลัก
-        function App() {
-            const { checkoutSuccess, cart } = useOrder();
-            const [showCart, setShowCart] = useState(false);
-            const [toastVisible, setToastVisible] = useState(false);
-            const [toastMessage, setToastMessage] = useState('');
+# แบ่งหน้าจอเป็น 2 คอลัมน์
+left_col, right_col = st.columns([1, 3])
+
+# คอลัมน์ซ้าย - ข้อมูลลูกค้าและคำแนะนำ
+with left_col:
+    # ข้อมูลลูกค้า
+    with st.container():
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        if not st.session_state.logged_in:
+            st.markdown("<h3>Please Input Customer ID</h3>", unsafe_allow_html=True)
             
-            const totalItems = Object.values(cart).reduce(
-                (sum, item) => sum + item.quantity, 
-                0
-            );
+            st.markdown("<div class='input-with-icon'>", unsafe_allow_html=True)
+            st.markdown("<span class='input-icon'>👤</span>", unsafe_allow_html=True)
+            member_id = st.text_input("Member ID", key="member_id", label_visibility="collapsed")
+            st.markdown("</div>", unsafe_allow_html=True)
             
-            useEffect(() => {
-                if (checkoutSuccess) {
-                    setToastMessage('ส่งเข้าครัวแล้ว - Your order has been sent to the kitchen');
-                    setToastVisible(true);
-                    setTimeout(() => setToastVisible(false), 3000);
-                    
-                    // ส่งข้อมูลไปยัง Streamlit Python ผ่าน window.parent.postMessage
-                    try {
-                        const orderData = {
-                            cart,
-                            totalItems,
-                            totalPrice: Object.values(cart).reduce(
-                                (sum, item) => sum + (item.price * item.quantity), 0
-                            )
-                        };
-                        // ส่งข้อมูลแบบ manual
-                        window.parent.postMessage({
-                            type: "streamlit:setComponentValue",
-                            value: orderData
-                        }, "*");
-                    } catch (err) {
-                        console.error("Error sending data to Streamlit:", err);
-                    }
-                }
-            }, [checkoutSuccess, cart, totalItems]);
+            st.markdown("<div class='input-with-icon'>", unsafe_allow_html=True)
+            st.markdown("<span class='input-icon'>📱</span>", unsafe_allow_html=True)
+            phone = st.text_input("Tel number", key="phone", label_visibility="collapsed")
+            st.markdown("</div>", unsafe_allow_html=True)
             
-            return h('div', { className: 'min-h-screen bg-gray-100 p-4' }, [
-                h('div', { className: 'flex flex-col h-[calc(100vh-2rem)]' }, [
-                    // Top section
-                    h('div', { className: 'flex justify-between items-center mb-4' }, [
-                        h('div', { className: 'w-1/4 pr-4' }, [
-                            h('h1', { className: 'text-3xl font-bold text-gray-800' }, 'DISHCOVERY')
-                        ]),
-                        
-                        h('div', { 
-                            className: 'flex-grow bg-orange-500 text-white flex items-center p-4 h-16 rounded-md' 
-                        }, [
-                            h('div', { className: 'text-xl font-bold' }, 'Welcome')
-                        ]),
-                        
-                        h('div', { className: 'relative ml-4' }, [
-                            h('button', { 
-                                className: 'bg-white rounded-md p-2 h-12 w-12 flex items-center justify-center',
-                                onClick: () => setShowCart(!showCart)
-                            }, [
-                                h('span', {}, '🛒'),
-                                totalItems > 0 && h('span', { 
-                                    className: 'absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs' 
-                                }, totalItems)
-                            ]),
-                            showCart && h('div', { 
-                                className: 'absolute top-full right-0 mt-2 z-50' 
-                            }, [
-                                h(ShoppingCart, { onClose: () => setShowCart(false) })
-                            ])
-                        ])
-                    ]),
-                    
-                    // Main content
-                    h('div', { className: 'flex gap-4 h-full' }, [
-                        // Left Column
-                        h('div', { className: 'w-1/4 flex flex-col gap-4' }, [
-                            h(CustomerInfo),
-                            h(RecommendationPanel)
-                        ]),
-                        
-                        // Right Column
-                        h('div', { className: 'w-3/4' }, [
-                            // Main Menu Header
-                            h('div', { 
-                                className: 'bg-gray-200 text-gray-800 flex items-center p-4 h-16 mb-4 rounded-md' 
-                            }, [
-                                h('div', { className: 'text-2xl font-bold' }, 'Main Menu')
-                            ]),
-                            
-                            // Food Menu
-                            h(FoodMenu)
-                        ])
-                    ])
-                ]),
-                
-                // Toast notification
-                toastVisible && h('div', { 
-                    className: 'fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-md shadow-lg' 
-                }, toastMessage)
-            ]);
-        }
-
-        // Wrap the App with OrderProvider
-        function AppWithProvider() {
-            return h(OrderProvider, {}, h(App));
-        }
-
-        // Render the app
-        const root = createRoot(document.getElementById('root'));
-        root.render(h(AppWithProvider));
-
-        // ฟังก์ชันเพื่อรับข้อมูลจาก Streamlit
-        window.addEventListener("message", function(event) {
-            // รับข้อมูลที่ส่งมาจาก Python
-            if (event.data.type === "streamlit:render") {
-                console.log("Received render event from Streamlit:", event.data);
-            }
-        });
-
-        // แจ้ง Streamlit ว่า component พร้อมใช้งาน
-        window.parent.postMessage({
-            type: "streamlit:componentReady",
-            value: {}
-        }, "*");
-    </script>
-</body>
-</html>
-"""
-
-dishcovery_component = components.html(component_html, height=800, scrolling=True)
-
-# ตรวจสอบให้แน่ใจว่า dishcovery_component ไม่ใช่ None และมีข้อมูลที่ถูกต้อง
-if dishcovery_component is not None:
-    # บันทึกข้อมูลลงใน session state
-    st.session_state['order_data'] = dishcovery_component
-    # ลองแสดงข้อมูลดิบเพื่อตรวจสอบรูปแบบ (อาจปิดคอมเมนต์หลังจากตรวจสอบแล้ว)
-    # st.write("Debug raw data:", dishcovery_component)
-
-# แสดงข้อมูลการสั่งอาหาร (จะแสดงเมื่อมีการส่งข้อมูลกลับมาจาก component)
-with st.expander("ดูข้อมูลการสั่งอาหาร", expanded=False):
-    if 'order_data' in st.session_state:
-        order_data = st.session_state['order_data']
-        st.write("### สรุปการสั่งซื้อ")
-        
-        # ตรวจสอบรูปแบบข้อมูลว่าเป็น dict หรือไม่
-        if isinstance(order_data, dict):
-            # ถ้าเป็น dict ให้เข้าถึงข้อมูลตามปกติ
-            st.write(f"จำนวนรายการทั้งหมด: {order_data.get('totalItems', 0)}")
-            st.write(f"ราคารวม: ฿{order_data.get('totalPrice', 0)}")
-            
-            if 'cart' in order_data and order_data['cart']:
-                st.write("### รายการอาหารที่สั่ง")
-                for name, item in order_data['cart'].items():
-                    st.write(f"**{name}** x {item['quantity']} - ฿{item['price'] * item['quantity']}")
-                    if 'remark' in item and item['remark']:
-                        st.write(f"*หมายเหตุ: {item['remark']}*")
-            else:
-                st.write("ไม่มีรายการอาหารในตะกร้า")
+            if st.button("Enter", key="login_button"):
+                if member_id == user_data["id"] and phone == user_data["phone"]:
+                    st.session_state.logged_in = True
+                    st.session_state.current_user = user_data
+                    st.experimental_rerun()
+                else:
+                    st.error("Invalid credentials")
         else:
-            # ถ้าไม่ใช่ dict ให้แสดงข้อมูลดิบ
-            st.write(f"ข้อมูลที่ได้รับ: {order_data}")
+            st.markdown("<h3>Customer Information</h3>", unsafe_allow_html=True)
+            
+            st.markdown("<div class='input-with-icon'>", unsafe_allow_html=True)
+            st.markdown("<span class='input-icon'>👤</span>", unsafe_allow_html=True)
+            st.text_input("Name", value=st.session_state.current_user["name"], disabled=True, label_visibility="collapsed")
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            st.markdown("<div class='input-with-icon'>", unsafe_allow_html=True)
+            st.markdown("<span class='input-icon'>👤</span>", unsafe_allow_html=True)
+            st.text_input("Surname", value=st.session_state.current_user["surname"], disabled=True, label_visibility="collapsed")
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            import datetime
+            current_date = datetime.datetime.now().strftime("Sunday, March 2, 2025, 12:00")
+            st.markdown(f"<div>Date & Time : {current_date}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Favorite Dishes
+    with st.container():
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("<div class='card-header'>Favorite Dishes</div>", unsafe_allow_html=True)
+        if st.session_state.logged_in and "favorite_dishes" in st.session_state.current_user:
+            for dish in st.session_state.current_user["favorite_dishes"]:
+                st.markdown(f"<div style='background-color: #f8fafc; padding: 10px; border-radius: 5px; margin-top: 5px;'>{dish}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown('<div style="color: #a0aec0;">No favorite dishes available</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Recommendations
+    with st.container():
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("<div class='card-header'>Recommendation</div>", unsafe_allow_html=True)
+        for rec in recommendations:
+            st.markdown(f"<div class='recommendation-item'><span>{'⚡ ' if rec['name'] == 'Omelette (new)' else ''}{rec['name']}</span><span>{rec['quantity']}</span></div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Allergic Food
+    with st.container():
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("<div class='card-header'>Allergic Food</div>", unsafe_allow_html=True)
+        if st.session_state.logged_in and "allergic_food" in st.session_state.current_user:
+            for allergen in st.session_state.current_user["allergic_food"]:
+                st.markdown(f"<div style='background-color: #f8fafc; padding: 10px; border-radius: 5px; margin-top: 5px;'>{allergen}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown('<div style="color: #a0aec0;"></div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# คอลัมน์ขวา - เมนูอาหาร
+with right_col:
+    st.markdown("<div style='background-color: #e2e8f0; padding: 15px; border-radius: 5px; margin-bottom: 15px;'><h2 style='margin: 0;'>Main Menu</h2></div>", unsafe_allow_html=True)
+    
+    # Search Bar
+    st.markdown("<div class='search-container'>", unsafe_allow_html=True)
+    st.markdown("<span class='search-icon'>🔍</span>", unsafe_allow_html=True)
+    search_query = st.text_input("Search", key="search", label_visibility="collapsed")
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Category Tabs
+    categories = ["All"] + list(menu_items.keys())
+    cols = st.columns(len(categories))
+    selected_tab = st.session_state.active_tab
+    
+    for i, category in enumerate(categories):
+        with cols[i]:
+            tab_class = "category-tab active" if selected_tab == category else "category-tab"
+            if st.button(f"⚡ {category}", key=f"tab_{category}", use_container_width=True):
+                st.session_state.active_tab = category
+                selected_tab = category
+    
+    # Display items based on search or category
+    all_items = []
+    for category, items in menu_items.items():
+        all_items.extend(items)
+    
+    if search_query:
+        display_items = [item for item in all_items if search_query.lower() in item["name"].lower()]
+    elif selected_tab == "All":
+        display_items = all_items
     else:
-        st.write("ยังไม่มีข้อมูลการสั่งอาหาร กรุณาสั่งอาหารและกดชำระเงิน")
+        display_items = menu_items.get(selected_tab, [])
+    
+    # JavaScript for interactive buttons
+    st.markdown("""
+    <script>
+    function incrementCounter(itemName) {
+        // Send event to Streamlit
+        window.parent.postMessage({
+            type: "streamlit:componentEvent",
+            action: "increment",
+            itemName: itemName
+        }, "*");
+    }
+    
+    function decrementCounter(itemName) {
+        // Send event to Streamlit
+        window.parent.postMessage({
+            type: "streamlit:componentEvent",
+            action: "decrement",
+            itemName: itemName
+        }, "*");
+    }
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Food Items with Add/Remove buttons
+    for item in display_items:
+        item_key = item["name"]
+        quantity = st.session_state.cart.get(item_key, {}).get("quantity", 0)
+        
+        cols = st.columns([1, 5, 1])
+        
+        with cols[0]:
+            # Display food image
+            if item["name"] in food_images:
+                img_url = food_images[item["name"]]
+                st.image(img_url, width=80)
+            else:
+                st.markdown("<div style='width: 80px; height: 80px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 5px;'>🍽️</div>", unsafe_allow_html=True)
+        
+        with cols[1]:
+            st.markdown(f"<div style='font-size: 18px; font-weight: 500; padding-top: 20px;'>{item['name']}</div>", unsafe_allow_html=True)
+        
+        with cols[2]:
+            # Counter buttons
+            st.markdown("""
+            <div style="display: flex; align-items: center; justify-content: center; padding-top: 20px;">
+                <button onClick="() => {}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background-color: white;">-</button>
+                <span style="margin: 0 10px; width: 20px; text-align: center;">0</span>
+                <button onClick="() => {}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background-color: white;">+</button>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            minus, count, plus = st.columns([1, 1, 1])
+            
+            with minus:
+                if st.button("-", key=f"minus_{item_key}", help=f"Reduce {item_key} quantity"):
+                    if item_key in st.session_state.cart and st.session_state.cart[item_key]["quantity"] > 0:
+                        st.session_state.cart[item_key]["quantity"] -= 1
+                        if st.session_state.cart[item_key]["quantity"] == 0:
+                            del st.session_state.cart[item_key]
+                        st.experimental_rerun()
+            
+            with count:
+                st.text(f"{quantity}")
+            
+            with plus:
+                if st.button("+", key=f"plus_{item_key}", help=f"Add {item_key} to cart"):
+                    if item_key in st.session_state.cart:
+                        st.session_state.cart[item_key]["quantity"] += 1
+                    else:
+                        st.session_state.cart[item_key] = {
+                            "name": item["name"],
+                            "price": item["price"],
+                            "quantity": 1,
+                            "remark": ""
+                        }
+                    st.experimental_rerun()
+
+# ตะกร้า
+if len(st.session_state.cart) > 0:
+    total_items = sum(item["quantity"] for item in st.session_state.cart.values())
+    total_price = sum(item["price"] * item["quantity"] for item in st.session_state.cart.values())
+    
+    st.sidebar.markdown("# Shopping Cart")
+    
+    for name, item in st.session_state.cart.items():
+        st.sidebar.markdown(f"**{name}** x {item['quantity']} - ฿{item['price'] * item['quantity']}")
+        if "remark" in item and item["remark"]:
+            st.sidebar.markdown(f"*Remark: {item['remark']}*")
+    
+    st.sidebar.markdown("---")
+    st.sidebar.markdown(f"### Total: ฿{total_price}")
+    
+    if st.sidebar.button("Checkout"):
+        st.session_state.checkout_success = True
+        st.sidebar.success("ส่งเข้าครัวแล้ว - Your order has been sent to the kitchen")
+        st.session_state.cart = {}
+        st.experimental_rerun()
