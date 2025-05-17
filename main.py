@@ -467,60 +467,75 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Favorite Dishes section with orange background
-        favorites_html = """
-        <div style="background-color: #e17a54; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white; margin: 0; font-size: 24px;">Favorite Dishes</h2>
-            </div>
-            <div style="background-color: white; padding: 15px; border-radius: 10px;">
-        """
+        # Raw HTML for Favorite Dishes section
+        st.markdown('''
+        <style>
+        .orange-container {
+            background-color: #e17a54;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .orange-header {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .orange-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 24px;
+        }
+        .white-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        </style>
+        ''', unsafe_allow_html=True)
         
-        # Add favorite dishes content
+        # Favorite Dishes section - all HTML to avoid Streamlit interference
+        favorites_html = '<div class="orange-container"><div class="orange-header"><h2>Favorite Dishes</h2></div><div class="white-box">'
         if "favorites" in st.session_state.user_data:
             for fav in st.session_state.user_data["favorites"]:
                 favorites_html += f'<div style="display: flex; align-items: center; margin-bottom: 5px;"><span style="margin-right: 10px;">•</span> {fav}</div>'
+        else:
+            favorites_html += 'No favorites found'
+        favorites_html += '</div></div>'
         
-        favorites_html += "</div></div>"
+        # Directly inject the HTML without using st.write inside
         st.markdown(favorites_html, unsafe_allow_html=True)
         
-        # Recommendations section with orange background
-        recommendations_html = """
-        <div style="background-color: #e17a54; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white; margin: 0; font-size: 24px;">Recommendation</h2>
-            </div>
-            <div style="background-color: white; padding: 15px; border-radius: 10px;">
-                <table style="width: 100%;">
-        """
+        # Recommendations section - using pure HTML
+        recommendations_html = '<div class="orange-container"><div class="orange-header"><h2>Recommendation</h2></div><div class="white-box">'
         
-        # Add recommendations content
+        # Add table directly in HTML
+        recommendations_html += '<table style="width: 100%;">'
         for rec in recommendations:
-            recommendations_html += f"""
+            recommendations_html += f'''
             <tr>
                 <td style="padding: 5px 0;">{rec['name']}</td>
                 <td style="text-align: right; color: green;">{rec['score']}</td>
             </tr>
-            """
+            '''
+        recommendations_html += '</table></div></div>'
         
-        recommendations_html += "</table></div></div>"
+        # Directly inject the HTML
         st.markdown(recommendations_html, unsafe_allow_html=True)
         
-        # Allergic Food section with orange background
-        allergic_html = """
-        <div style="background-color: #e17a54; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white; margin: 0; font-size: 24px;">Allergic Food</h2>
-            </div>
-            <div style="background-color: white; padding: 15px; border-radius: 10px;">
-        """
+        # Allergic Food section - using pure HTML
+        allergic_html = '<div class="orange-container"><div class="orange-header"><h2>Allergic Food</h2></div><div class="white-box">'
         
-        # Add allergic food content
         if "allergies" in st.session_state.user_data:
             for allergy in st.session_state.user_data["allergies"]:
                 allergic_html += f'<div style="display: flex; align-items: center; margin-bottom: 5px;"><span style="margin-right: 10px;">•</span> {allergy}</div>'
+        else:
+            allergic_html += 'No allergies found'
+        allergic_html += '</div></div>'
         
-        allergic_html += "</div></div>"
+        # Directly inject the HTML
         st.markdown(allergic_html, unsafe_allow_html=True)
 
 with col2:
