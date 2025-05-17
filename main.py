@@ -467,10 +467,10 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Raw HTML for Favorite Dishes section
-        st.markdown('''
+        # Custom CSS for the orange sections
+        st.markdown("""
         <style>
-        .orange-container {
+        .orange-section {
             background-color: #e17a54;
             border-radius: 10px;
             padding: 15px;
@@ -478,15 +478,13 @@ with col1:
         }
         .orange-header {
             background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px;
             border-radius: 10px;
-            padding: 10px;
             margin-bottom: 10px;
             text-align: center;
-        }
-        .orange-header h2 {
-            color: white;
-            margin: 0;
             font-size: 24px;
+            font-weight: bold;
         }
         .white-box {
             background-color: white;
@@ -494,48 +492,50 @@ with col1:
             padding: 15px;
         }
         </style>
-        ''', unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
         
-        # Favorite Dishes section - all HTML to avoid Streamlit interference
-        favorites_html = '<div class="orange-container"><div class="orange-header"><h2>Favorite Dishes</h2></div><div class="white-box">'
+        # Favorite Dishes section
+        st.markdown('<div class="orange-section">', unsafe_allow_html=True)
+        st.markdown('<div class="orange-header">Favorite Dishes</div>', unsafe_allow_html=True)
+        st.markdown('<div class="white-box">', unsafe_allow_html=True)
+        
+        # Content inside white box
         if "favorites" in st.session_state.user_data:
             for fav in st.session_state.user_data["favorites"]:
-                favorites_html += f'<div style="display: flex; align-items: center; margin-bottom: 5px;"><span style="margin-right: 10px;">•</span> {fav}</div>'
+                st.write(f"• {fav}")
         else:
-            favorites_html += 'No favorites found'
-        favorites_html += '</div></div>'
+            st.write("No favorites found.")
+            
+        st.markdown('</div></div>', unsafe_allow_html=True)
         
-        # Directly inject the HTML without using st.write inside
-        st.markdown(favorites_html, unsafe_allow_html=True)
+        # Recommendation section
+        st.markdown('<div class="orange-section">', unsafe_allow_html=True)
+        st.markdown('<div class="orange-header">Recommendation</div>', unsafe_allow_html=True)
+        st.markdown('<div class="white-box">', unsafe_allow_html=True)
         
-        # Recommendations section - using pure HTML but avoiding table tags
-        recommendations_html = '<div class="orange-container"><div class="orange-header"><h2>Recommendation</h2></div><div class="white-box">'
-        
-        # Use div for layout instead of table
+        # Content inside white box
         for rec in recommendations:
-            recommendations_html += f'''
-            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                <div>{rec['name']}</div>
-                <div style="color: green;">{rec['score']}</div>
-            </div>
-            '''
-        recommendations_html += '</div></div>'
+            cols = st.columns([3, 1])
+            with cols[0]:
+                st.write(rec["name"])
+            with cols[1]:
+                st.markdown(f'<p style="text-align: right; color: green;">{rec["score"]}</p>', unsafe_allow_html=True)
+            
+        st.markdown('</div></div>', unsafe_allow_html=True)
         
-        # Directly inject the HTML
-        st.markdown(recommendations_html, unsafe_allow_html=True)
+        # Allergic Food section
+        st.markdown('<div class="orange-section">', unsafe_allow_html=True)
+        st.markdown('<div class="orange-header">Allergic Food</div>', unsafe_allow_html=True)
+        st.markdown('<div class="white-box">', unsafe_allow_html=True)
         
-        # Allergic Food section - using pure HTML
-        allergic_html = '<div class="orange-container"><div class="orange-header"><h2>Allergic Food</h2></div><div class="white-box">'
-        
+        # Content inside white box
         if "allergies" in st.session_state.user_data:
             for allergy in st.session_state.user_data["allergies"]:
-                allergic_html += f'<div style="display: flex; align-items: center; margin-bottom: 5px;"><span style="margin-right: 10px;">•</span> {allergy}</div>'
+                st.write(f"• {allergy}")
         else:
-            allergic_html += 'No allergies found'
-        allergic_html += '</div></div>'
-        
-        # Directly inject the HTML
-        st.markdown(allergic_html, unsafe_allow_html=True)
+            st.write("No allergies found.")
+            
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
 with col2:
     # Welcome banner
