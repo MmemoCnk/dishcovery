@@ -523,40 +523,41 @@ with col2:
     
     # Display menu items
     for item in filtered_items:
-        col_img, col_info, col_actions = st.columns([1, 3, 1])
-        
-        with col_img:
-            st.image(item["image"], width=100)
-        
-        with col_info:
-            st.write(f"### {item['name']}")
-            st.write(f"฿{item['price']}")
-        
-        with col_actions:
-            quantity = get_item_quantity(item["id"])
+        menu_card = st.container()
+        with menu_card:
+            cols = st.columns([1, 3, 1])
             
-            col_minus, col_qty, col_plus = st.columns([1, 1, 1])
+            with cols[0]:
+                st.image(item["image"], width=100)
             
-            with col_minus:
-                if st.button("-", key=f"minus_{item['id']}"):
+            with cols[1]:
+                st.write(f"### {item['name']}")
+                st.write(f"฿{item['price']}")
+            
+            with cols[2]:
+                quantity = get_item_quantity(item["id"])
+                
+                # Display quantity controls in a horizontal layout
+                st.write(f"Quantity: {quantity}")
+                
+                minus_btn = st.button("-", key=f"minus_{item['id']}")
+                if minus_btn:
                     if quantity > 0:
                         update_cart_quantity(item["id"], quantity - 1)
                         st.experimental_rerun()
-            
-            with col_qty:
-                st.write(f"{quantity}")
-            
-            with col_plus:
-                if st.button("+", key=f"plus_{item['id']}"):
+                
+                plus_btn = st.button("+", key=f"plus_{item['id']}")
+                if plus_btn:
                     # When clicking +, add directly to cart
                     add_to_cart(item)
                     st.experimental_rerun()
-            
-            # Clicking the item area should open dialog
-            if st.button("View Details", key=f"view_{item['id']}"):
-                st.session_state.show_food_dialog = True
-                st.session_state.selected_food = item
-                st.experimental_rerun()
+                
+                # Clicking the item area should open dialog
+                view_btn = st.button("View Details", key=f"view_{item['id']}")
+                if view_btn:
+                    st.session_state.show_food_dialog = True
+                    st.session_state.selected_food = item
+                    st.experimental_rerun()
 
     # Food dialog
     if st.session_state.show_food_dialog and st.session_state.selected_food:
