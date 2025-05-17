@@ -467,17 +467,20 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
+        # Wrapper for the orange background sections
+        st.markdown('<div class="left-sidebar">', unsafe_allow_html=True)
+        
         # Favorite Dishes section
-        st.markdown('<div class="side-panel-section">', unsafe_allow_html=True)
         st.markdown('<h3 class="section-header">Favorite Dishes</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="content-box">', unsafe_allow_html=True)
         if "favorites" in st.session_state.user_data:
             for fav in st.session_state.user_data["favorites"]:
                 st.write(f"- {fav}")
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Recommendations section
-        st.markdown('<div class="side-panel-section">', unsafe_allow_html=True)
         st.markdown('<h3 class="section-header">Recommendation</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="content-box">', unsafe_allow_html=True)
         for rec in recommendations:
             col_rec1, col_rec2 = st.columns([3, 1])
             with col_rec1:
@@ -487,11 +490,14 @@ with col1:
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Allergic Food section
-        st.markdown('<div class="side-panel-section">', unsafe_allow_html=True)
         st.markdown('<h3 class="section-header">Allergic Food</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="content-box">', unsafe_allow_html=True)
         if "allergies" in st.session_state.user_data:
             for allergy in st.session_state.user_data["allergies"]:
                 st.write(f"- {allergy}")
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Close the sidebar wrapper
         st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
