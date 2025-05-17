@@ -468,46 +468,60 @@ with col1:
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Favorite Dishes section with orange background
-        st.markdown("""
-        <div style="background-color: #e17a54; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <h3 style="color: white; text-align: center; padding: 0.5rem; background-color: rgba(255,255,255,0.2); border-radius: 5px;">Favorite Dishes</h3>
-            <div style="background-color: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.5rem;">
-        """, unsafe_allow_html=True)
+        favorites_html = """
+        <div style="background-color: #e17a54; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+                <h2 style="color: white; margin: 0; font-size: 24px;">Favorite Dishes</h2>
+            </div>
+            <div style="background-color: white; padding: 15px; border-radius: 10px;">
+        """
         
+        # Add favorite dishes content
         if "favorites" in st.session_state.user_data:
             for fav in st.session_state.user_data["favorites"]:
-                st.write(f"- {fav}")
+                favorites_html += f'<div style="display: flex; align-items: center; margin-bottom: 5px;"><span style="margin-right: 10px;">•</span> {fav}</div>'
         
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        favorites_html += "</div></div>"
+        st.markdown(favorites_html, unsafe_allow_html=True)
         
         # Recommendations section with orange background
-        st.markdown("""
-        <div style="background-color: #e17a54; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <h3 style="color: white; text-align: center; padding: 0.5rem; background-color: rgba(255,255,255,0.2); border-radius: 5px;">Recommendation</h3>
-            <div style="background-color: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.5rem;">
-        """, unsafe_allow_html=True)
+        recommendations_html = """
+        <div style="background-color: #e17a54; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+                <h2 style="color: white; margin: 0; font-size: 24px;">Recommendation</h2>
+            </div>
+            <div style="background-color: white; padding: 15px; border-radius: 10px;">
+                <table style="width: 100%;">
+        """
         
+        # Add recommendations content
         for rec in recommendations:
-            col_rec1, col_rec2 = st.columns([3, 1])
-            with col_rec1:
-                st.write(rec["name"])
-            with col_rec2:
-                st.write(rec["score"])
+            recommendations_html += f"""
+            <tr>
+                <td style="padding: 5px 0;">{rec['name']}</td>
+                <td style="text-align: right; color: green;">{rec['score']}</td>
+            </tr>
+            """
         
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        recommendations_html += "</table></div></div>"
+        st.markdown(recommendations_html, unsafe_allow_html=True)
         
         # Allergic Food section with orange background
-        st.markdown("""
-        <div style="background-color: #e17a54; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <h3 style="color: white; text-align: center; padding: 0.5rem; background-color: rgba(255,255,255,0.2); border-radius: 5px;">Allergic Food</h3>
-            <div style="background-color: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.5rem;">
-        """, unsafe_allow_html=True)
+        allergic_html = """
+        <div style="background-color: #e17a54; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+                <h2 style="color: white; margin: 0; font-size: 24px;">Allergic Food</h2>
+            </div>
+            <div style="background-color: white; padding: 15px; border-radius: 10px;">
+        """
         
+        # Add allergic food content
         if "allergies" in st.session_state.user_data:
             for allergy in st.session_state.user_data["allergies"]:
-                st.write(f"- {allergy}")
+                allergic_html += f'<div style="display: flex; align-items: center; margin-bottom: 5px;"><span style="margin-right: 10px;">•</span> {allergy}</div>'
         
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        allergic_html += "</div></div>"
+        st.markdown(allergic_html, unsafe_allow_html=True)
 
 with col2:
     # Welcome banner
