@@ -1,7 +1,6 @@
 import streamlit as st
-import base64
-from PIL import Image
 import requests
+from PIL import Image
 from io import BytesIO
 
 # กำหนดการตั้งค่าของหน้า
@@ -33,48 +32,6 @@ button {
 button:hover {
     background-color: rgba(0,0,0,0.1);
 }
-.menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 5px;
-    background-color: white;
-    border-radius: 5px;
-}
-.menu-image {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 5px;
-    margin-right: 15px;
-}
-.menu-name {
-    flex-grow: 1;
-    font-size: 18px;
-    font-weight: 500;
-}
-.menu-counter {
-    display: flex;
-    align-items: center;
-}
-.counter-button {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid #e2e8f0;
-    background-color: white;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-.counter-value {
-    width: 30px;
-    text-align: center;
-    font-size: 16px;
-    margin: 0 5px;
-}
 .card {
     background-color: white;
     border-radius: 8px;
@@ -91,14 +48,6 @@ button:hover {
     font-weight: 600;
     font-size: 18px;
     text-align: center;
-}
-.recommendation-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    background-color: #f8fafc;
-    border-radius: 4px;
-    margin-bottom: 5px;
 }
 .input-with-icon {
     position: relative;
@@ -119,40 +68,6 @@ button:hover {
     transform: translateY(-50%);
     color: #aaa;
 }
-.search-container {
-    position: relative;
-    margin-bottom: 15px;
-}
-.search-container input {
-    width: 100%;
-    padding: 10px 10px 10px 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-}
-.search-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-.category-tab {
-    padding: 8px 16px;
-    background-color: white;
-    border: 1px solid #e2e8f0;
-    cursor: pointer;
-    text-align: center;
-    border-radius: 4px;
-}
-.category-tab.active {
-    background-color: #f8fafc;
-    border-bottom: 2px solid #4a5568;
-}
-.top-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
 .welcome-banner {
     background-color: #e67e22; /* Orange */
     color: white;
@@ -163,6 +78,22 @@ button:hover {
     margin: 0 20px;
     font-size: 24px;
     font-weight: bold;
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.quantity-container {
+    display: flex;
+    align-items: center;
+}
+.quantity-text {
+    width: 30px;
+    text-align: center;
 }
 </style>
 """
@@ -182,7 +113,8 @@ menu_items = {
     "Main Dishes": [
         {"name": "Tom Yum Kung", "price": 120},
         {"name": "Pad Thai", "price": 100},
-        {"name": "Stir fried Thai basil", "price": 90}
+        {"name": "Stir fried Thai basil", "price": 90},
+        {"name": "Rice", "price": 30}
     ],
     "Soup": [
         {"name": "Chicken Soup", "price": 80},
@@ -198,16 +130,6 @@ menu_items = {
         {"name": "Thai Milk Tea", "price": 50}
     ]
 }
-
-# เพิ่ม "Rice" ใน Main Dishes
-rice_exists = False
-for item in menu_items["Main Dishes"]:
-    if item["name"] == "Rice":
-        rice_exists = True
-        break
-        
-if not rice_exists:
-    menu_items["Main Dishes"].append({"name": "Rice", "price": 30})
 
 # ข้อมูลคำแนะนำ
 recommendations = [
@@ -248,19 +170,7 @@ def load_image_from_url(url):
         img = Image.open(BytesIO(response.content))
         return img
     except:
-        return Image.new('RGB', (100, 100), color = 'grey')
-
-# ฟังก์ชั่นสำหรับสร้างปุ่ม +/-
-def create_counter(item_key):
-    quantity = st.session_state.cart.get(item_key, {}).get("quantity", 0)
-    html = f"""
-    <div class="menu-counter">
-        <button class="counter-button" onclick="decrementCounter('{item_key}')">-</button>
-        <div class="counter-value">{quantity}</div>
-        <button class="counter-button" onclick="incrementCounter('{item_key}')">+</button>
-    </div>
-    """
-    return html
+        return None
 
 # หัวข้อหลัก
 col1, col2, col3 = st.columns([1, 4, 1])
@@ -305,12 +215,12 @@ with left_col:
             
             st.markdown("<div class='input-with-icon'>", unsafe_allow_html=True)
             st.markdown("<span class='input-icon'>👤</span>", unsafe_allow_html=True)
-            st.text_input("Name", value=st.session_state.current_user["name"], disabled=True, label_visibility="collapsed")
+            st.text_input("Name:", value=st.session_state.current_user["name"], disabled=True, label_visibility="collapsed")
             st.markdown("</div>", unsafe_allow_html=True)
             
             st.markdown("<div class='input-with-icon'>", unsafe_allow_html=True)
             st.markdown("<span class='input-icon'>👤</span>", unsafe_allow_html=True)
-            st.text_input("Surname", value=st.session_state.current_user["surname"], disabled=True, label_visibility="collapsed")
+            st.text_input("Surname:", value=st.session_state.current_user["surname"], disabled=True, label_visibility="collapsed")
             st.markdown("</div>", unsafe_allow_html=True)
             
             import datetime
@@ -334,7 +244,7 @@ with left_col:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.markdown("<div class='card-header'>Recommendation</div>", unsafe_allow_html=True)
         for rec in recommendations:
-            st.markdown(f"<div class='recommendation-item'><span>{'⚡ ' if rec['name'] == 'Omelette (new)' else ''}{rec['name']}</span><span>{rec['quantity']}</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background-color: #f8fafc; padding: 10px; border-radius: 5px; margin-top: 5px; display: flex; justify-content: space-between;'><span>{'⚡ ' if rec['name'] == 'Omelette (new)' else ''}{rec['name']}</span><span>{rec['quantity']}</span></div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
     
     # Allergic Food
@@ -353,10 +263,7 @@ with right_col:
     st.markdown("<div style='background-color: #e2e8f0; padding: 15px; border-radius: 5px; margin-bottom: 15px;'><h2 style='margin: 0;'>Main Menu</h2></div>", unsafe_allow_html=True)
     
     # Search Bar
-    st.markdown("<div class='search-container'>", unsafe_allow_html=True)
-    st.markdown("<span class='search-icon'>🔍</span>", unsafe_allow_html=True)
-    search_query = st.text_input("Search", key="search", label_visibility="collapsed")
-    st.markdown("</div>", unsafe_allow_html=True)
+    search_query = st.text_input("🔍 Search", key="search")
     
     # Category Tabs
     categories = ["All"] + list(menu_items.keys())
@@ -365,7 +272,7 @@ with right_col:
     
     for i, category in enumerate(categories):
         with cols[i]:
-            tab_class = "category-tab active" if selected_tab == category else "category-tab"
+            tab_class = "active" if selected_tab == category else ""
             if st.button(f"⚡ {category}", key=f"tab_{category}", use_container_width=True):
                 st.session_state.active_tab = category
                 selected_tab = category
@@ -382,82 +289,53 @@ with right_col:
     else:
         display_items = menu_items.get(selected_tab, [])
     
-    # JavaScript for interactive buttons
-    st.markdown("""
-    <script>
-    function incrementCounter(itemName) {
-        // Send event to Streamlit
-        window.parent.postMessage({
-            type: "streamlit:componentEvent",
-            action: "increment",
-            itemName: itemName
-        }, "*");
-    }
-    
-    function decrementCounter(itemName) {
-        // Send event to Streamlit
-        window.parent.postMessage({
-            type: "streamlit:componentEvent",
-            action: "decrement",
-            itemName: itemName
-        }, "*");
-    }
-    </script>
-    """, unsafe_allow_html=True)
-    
     # Food Items with Add/Remove buttons
     for item in display_items:
         item_key = item["name"]
         quantity = st.session_state.cart.get(item_key, {}).get("quantity", 0)
         
-        cols = st.columns([1, 5, 1])
-        
-        with cols[0]:
-            # Display food image
-            if item["name"] in food_images:
-                img_url = food_images[item["name"]]
-                st.image(img_url, width=80)
-            else:
-                st.markdown("<div style='width: 80px; height: 80px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 5px;'>🍽️</div>", unsafe_allow_html=True)
-        
-        with cols[1]:
-            st.markdown(f"<div style='font-size: 18px; font-weight: 500; padding-top: 20px;'>{item['name']}</div>", unsafe_allow_html=True)
-        
-        with cols[2]:
-            # Counter buttons
-            st.markdown("""
-            <div style="display: flex; align-items: center; justify-content: center; padding-top: 20px;">
-                <button onClick="() => {}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background-color: white;">-</button>
-                <span style="margin: 0 10px; width: 20px; text-align: center;">0</span>
-                <button onClick="() => {}" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background-color: white;">+</button>
+        st.markdown(f"""
+        <div class="menu-item">
+            <div style="display: flex; align-items: center; width: 100%;">
+                <div style="margin-right: 15px;">
+                    <img src="{food_images.get(item['name'], '')}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                </div>
+                <div style="flex-grow: 1;">
+                    <h3 style="margin: 0;">{item['name']}</h3>
+                </div>
             </div>
-            """, unsafe_allow_html=True)
-            
-            minus, count, plus = st.columns([1, 1, 1])
-            
-            with minus:
-                if st.button("-", key=f"minus_{item_key}", help=f"Reduce {item_key} quantity"):
-                    if item_key in st.session_state.cart and st.session_state.cart[item_key]["quantity"] > 0:
-                        st.session_state.cart[item_key]["quantity"] -= 1
-                        if st.session_state.cart[item_key]["quantity"] == 0:
-                            del st.session_state.cart[item_key]
-                        st.experimental_rerun()
-            
-            with count:
-                st.text(f"{quantity}")
-            
-            with plus:
-                if st.button("+", key=f"plus_{item_key}", help=f"Add {item_key} to cart"):
-                    if item_key in st.session_state.cart:
-                        st.session_state.cart[item_key]["quantity"] += 1
-                    else:
-                        st.session_state.cart[item_key] = {
-                            "name": item["name"],
-                            "price": item["price"],
-                            "quantity": 1,
-                            "remark": ""
-                        }
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # ปุ่ม + และ - สำหรับตะกร้า
+        col1, col2, col3 = st.columns([1, 10, 1])
+        
+        with col1:
+            # ปุ่มลบ
+            if st.button("-", key=f"minus_{item_key}"):
+                if item_key in st.session_state.cart and st.session_state.cart[item_key]["quantity"] > 0:
+                    st.session_state.cart[item_key]["quantity"] -= 1
+                    if st.session_state.cart[item_key]["quantity"] == 0:
+                        del st.session_state.cart[item_key]
                     st.experimental_rerun()
+        
+        with col2:
+            # แสดงจำนวน
+            st.markdown(f"<div style='text-align: center;'>{quantity}</div>", unsafe_allow_html=True)
+        
+        with col3:
+            # ปุ่มเพิ่ม
+            if st.button("+", key=f"plus_{item_key}"):
+                if item_key in st.session_state.cart:
+                    st.session_state.cart[item_key]["quantity"] += 1
+                else:
+                    st.session_state.cart[item_key] = {
+                        "name": item["name"],
+                        "price": item["price"],
+                        "quantity": 1,
+                        "remark": ""
+                    }
+                st.experimental_rerun()
 
 # ตะกร้า
 if len(st.session_state.cart) > 0:
