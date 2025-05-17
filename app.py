@@ -700,25 +700,35 @@ component_html = """
 
 dishcovery_component = components.html(component_html, height=800, scrolling=True)
 
-# ตัวแปร dishcovery_component จะมีค่าเมื่อมีการส่งข้อมูลกลับมาจาก component
-if dishcovery_component:
+# ตรวจสอบให้แน่ใจว่า dishcovery_component ไม่ใช่ None และมีข้อมูลที่ถูกต้อง
+if dishcovery_component is not None:
+    # บันทึกข้อมูลลงใน session state
     st.session_state['order_data'] = dishcovery_component
+    # ลองแสดงข้อมูลดิบเพื่อตรวจสอบรูปแบบ (อาจปิดคอมเมนต์หลังจากตรวจสอบแล้ว)
+    # st.write("Debug raw data:", dishcovery_component)
 
 # แสดงข้อมูลการสั่งอาหาร (จะแสดงเมื่อมีการส่งข้อมูลกลับมาจาก component)
 with st.expander("ดูข้อมูลการสั่งอาหาร", expanded=False):
     if 'order_data' in st.session_state:
         order_data = st.session_state['order_data']
         st.write("### สรุปการสั่งซื้อ")
-        st.write(f"จำนวนรายการทั้งหมด: {order_data.get('totalItems', 0)}")
-        st.write(f"ราคารวม: ฿{order_data.get('totalPrice', 0)}")
         
-        if 'cart' in order_data and order_data['cart']:
-            st.write("### รายการอาหารที่สั่ง")
-            for name, item in order_data['cart'].items():
-                st.write(f"**{name}** x {item['quantity']} - ฿{item['price'] * item['quantity']}")
-                if 'remark' in item and item['remark']:
-                    st.write(f"*หมายเหตุ: {item['remark']}*")
+        # ตรวจสอบรูปแบบข้อมูลว่าเป็น dict หรือไม่
+        if isinstance(order_data, dict):
+            # ถ้าเป็น dict ให้เข้าถึงข้อมูลตามปกติ
+            st.write(f"จำนวนรายการทั้งหมด: {order_data.get('totalItems', 0)}")
+            st.write(f"ราคารวม: ฿{order_data.get('totalPrice', 0)}")
+            
+            if 'cart' in order_data and order_data['cart']:
+                st.write("### รายการอาหารที่สั่ง")
+                for name, item in order_data['cart'].items():
+                    st.write(f"**{name}** x {item['quantity']} - ฿{item['price'] * item['quantity']}")
+                    if 'remark' in item and item['remark']:
+                        st.write(f"*หมายเหตุ: {item['remark']}*")
+            else:
+                st.write("ไม่มีรายการอาหารในตะกร้า")
         else:
-            st.write("ไม่มีรายการอาหารในตะกร้า")
+            # ถ้าไม่ใช่ dict ให้แสดงข้อมูลดิบ
+            st.write(f"ข้อมูลที่ได้รับ: {order_data}")
     else:
         st.write("ยังไม่มีข้อมูลการสั่งอาหาร กรุณาสั่งอาหารและกดชำระเงิน")
