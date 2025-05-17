@@ -467,38 +467,47 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Wrapper for the orange background sections
-        st.markdown('<div class="left-sidebar">', unsafe_allow_html=True)
+        # Favorite Dishes section with orange background
+        st.markdown("""
+        <div style="background-color: #e17a54; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <h3 style="color: white; text-align: center; padding: 0.5rem; background-color: rgba(255,255,255,0.2); border-radius: 5px;">Favorite Dishes</h3>
+            <div style="background-color: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.5rem;">
+        """, unsafe_allow_html=True)
         
-        # Favorite Dishes section
-        st.markdown('<h3 class="section-header">Favorite Dishes</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="content-box">', unsafe_allow_html=True)
         if "favorites" in st.session_state.user_data:
             for fav in st.session_state.user_data["favorites"]:
                 st.write(f"- {fav}")
-        st.markdown('</div>', unsafe_allow_html=True)
         
-        # Recommendations section
-        st.markdown('<h3 class="section-header">Recommendation</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="content-box">', unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
+        
+        # Recommendations section with orange background
+        st.markdown("""
+        <div style="background-color: #e17a54; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <h3 style="color: white; text-align: center; padding: 0.5rem; background-color: rgba(255,255,255,0.2); border-radius: 5px;">Recommendation</h3>
+            <div style="background-color: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.5rem;">
+        """, unsafe_allow_html=True)
+        
         for rec in recommendations:
             col_rec1, col_rec2 = st.columns([3, 1])
             with col_rec1:
                 st.write(rec["name"])
             with col_rec2:
                 st.write(rec["score"])
-        st.markdown('</div>', unsafe_allow_html=True)
         
-        # Allergic Food section
-        st.markdown('<h3 class="section-header">Allergic Food</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="content-box">', unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
+        
+        # Allergic Food section with orange background
+        st.markdown("""
+        <div style="background-color: #e17a54; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <h3 style="color: white; text-align: center; padding: 0.5rem; background-color: rgba(255,255,255,0.2); border-radius: 5px;">Allergic Food</h3>
+            <div style="background-color: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.5rem;">
+        """, unsafe_allow_html=True)
+        
         if "allergies" in st.session_state.user_data:
             for allergy in st.session_state.user_data["allergies"]:
                 st.write(f"- {allergy}")
-        st.markdown('</div>', unsafe_allow_html=True)
         
-        # Close the sidebar wrapper
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
 with col2:
     # Welcome banner
