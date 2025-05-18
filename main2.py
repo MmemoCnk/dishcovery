@@ -290,8 +290,37 @@ with col2:
                 # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # ULTRA-SIMPLE approach without nested anything
-                # Just show the quantity and two separate buttons
-                st.button("-", key=f"minus_btn_{i}", on_click=set_clicked_minus, args=(item["id"],))
-                st.write(f"**{quantity}**")
-                st.button("+", key=f"plus_btn_{i}", on_click=set_clicked_plus, args=(item["id"],))
+                # SIMPLEST approach - just put buttons in a row with text
+                # Use URL parameters since they actually work
+                st.markdown(f"""
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                    <a href="?minus={item['id']}" style="text-decoration: none;">
+                        <div style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px; 
+                                  display: flex; align-items: center; justify-content: center; 
+                                  font-weight: bold; font-size: 16px;">-</div>
+                    </a>
+                    <span style="font-weight: bold; width: 20px; text-align: center;">{quantity}</span>
+                    <a href="?plus={item['id']}" style="text-decoration: none;">
+                        <div style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px; 
+                                  display: flex; align-items: center; justify-content: center; 
+                                  font-weight: bold; font-size: 16px;">+</div>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
+
+# Handle URL parameters for button actions
+params = st.query_params
+
+if "plus" in params:
+    item_id = params["plus"][0]
+    add_to_cart(item_id)
+    # Clear parameter and refresh
+    del st.query_params["plus"]
+    st.rerun()
+
+if "minus" in params:
+    item_id = params["minus"][0]
+    remove_from_cart(item_id)
+    # Clear parameter and refresh
+    del st.query_params["minus"]
+    st.rerun()
