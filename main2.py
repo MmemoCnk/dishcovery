@@ -73,6 +73,16 @@ def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
     return st.session_state.cart.get(item_id, 0)
 
+# Track which button was clicked
+if 'last_clicked' not in st.session_state:
+    st.session_state.last_clicked = None
+
+def set_clicked_minus(item_id):
+    st.session_state.last_clicked = f"minus_{item_id}"
+
+def set_clicked_plus(item_id):
+    st.session_state.last_clicked = f"plus_{item_id}"
+
 # Sample menu items
 menu_items = [
     {
@@ -112,22 +122,14 @@ menu_items = [
     }
 ]
 
-# Handle URL parameters for button actions
-params = st.query_params
-
-if "plus" in params:
-    item_id = params["plus"][0]
-    add_to_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["plus"]
-    st.rerun()
-
-if "minus" in params:
-    item_id = params["minus"][0]
-    remove_from_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["minus"]
-    st.rerun()
+# Process any button clicks from the previous render
+if st.session_state.last_clicked:
+    action, item_id = st.session_state.last_clicked.split('_')
+    if action == 'minus':
+        remove_from_cart(item_id)
+    elif action == 'plus':
+        add_to_cart(item_id)
+    st.session_state.last_clicked = None
 
 # Cart icon at top right
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
@@ -288,5 +290,8 @@ with col2:
                 # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # SIMPLE APPROACH: Direct links with button labels
-                st.write(f"[**-**](?minus={item['id']}) {quantity} [**+**](?plus={item['id']})")
+                # ULTRA-SIMPLE approach without nested anything
+                # Just show the quantity and two separate buttons
+                st.button("-", key=f"minus_btn_{i}", on_click=set_clicked_minus, args=(item["id"],))
+                st.write(f"**{quantity}**")
+                st.button("+", key=f"plus_btn_{i}", on_click=set_clicked_plus, args=(item["id"],))
