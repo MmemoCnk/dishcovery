@@ -11,70 +11,22 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS for styling - focus on making buttons work exactly where they appear
+# Initialize session state for cart
+if 'cart' not in st.session_state:
+    st.session_state.cart = {}
+
+# Custom CSS to position the cart icon
 st.markdown("""
 <style>
-    /* DISHCOVERY title */
-    .dishcovery-title {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #333;
+    /* Cart icon at top right corner */
+    .cart-icon {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        z-index: 9999;
     }
     
-    /* Welcome banner */
-    .welcome-banner {
-        background-color: #e17a54;
-        color: white;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-bottom: 1rem;
-    }
-    
-    /* Side panel sections */
-    .section-container {
-        background-color: #e17a54;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-    
-    .section-header {
-        background-color: rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-    }
-    
-    .section-content {
-        background-color: white;
-        border-radius: 10px;
-        padding: 15px;
-    }
-    
-    /* Shopping cart fixed element */
-    .cart-fixed {
-        position: fixed !important;
-        top: 80px !important;
-        right: 40px !important;
-        z-index: 9999 !important;
-    }
-    
-    /* Shopping cart SVG icon */
-    .cart-icon svg {
-        width: 40px;
-        height: 40px;
-        fill: none;
-        stroke: black;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-    
-    /* Cart counter */
+    /* Cart counter badge */
     .cart-counter {
         position: absolute;
         top: -8px;
@@ -91,44 +43,6 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* CRITICAL: Hide the original Streamlit buttons completely */
-    div.stButton {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-    
-    /* Style for our visible buttons - these are separate HTML elements */
-    .visible-button {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: white;
-        border: 1px solid #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        cursor: pointer;
-        position: absolute;
-        z-index: 100;
-    }
-    
-    .minus-btn {
-        right: 70px; /* Position the minus button */
-    }
-    
-    .plus-btn {
-        right: 30px; /* Position the plus button */
-    }
-    
-    .quantity-value {
-        position: absolute;
-        right: 50px;
-        width: 20px;
-        text-align: center;
-    }
-    
     /* Hide Streamlit elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -136,49 +50,22 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# JavaScript for positioning buttons exactly over where they appear
-st.markdown("""
-<script>
-    // Function to position buttons precisely after everything is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // This runs after the page is fully loaded
-        setTimeout(function() {
-            // Your positioning code here if needed
-            console.log('Page fully loaded, adjusting button positions');
-        }, 1000);
-    });
-</script>
-""", unsafe_allow_html=True)
-
-# Initialize session state for cart
-if 'cart' not in st.session_state:
-    st.session_state.cart = {}
-
-# Handle button clicks via custom parameters
-params = st.query_params
-if 'add' in params:
-    item_id = params.get('add')[0]
-    # Add item to cart
+# Helper functions for cart management
+def add_to_cart(item_id):
+    """Add an item to the cart"""
     if item_id in st.session_state.cart:
         st.session_state.cart[item_id] += 1
     else:
         st.session_state.cart[item_id] = 1
-    # Clear parameter
-    del st.query_params['add']
-    st.rerun()
 
-if 'remove' in params:
-    item_id = params.get('remove')[0]
-    # Remove from cart
-    if item_id in st.session_state.cart and st.session_state.cart[item_id] > 0:
-        st.session_state.cart[item_id] -= 1
-        if st.session_state.cart[item_id] == 0:
-            del st.session_state.cart[item_id]
-    # Clear parameter
-    del st.query_params['remove']
-    st.rerun()
+def remove_from_cart(item_id):
+    """Remove an item from the cart"""
+    if item_id in st.session_state.cart:
+        if st.session_state.cart[item_id] > 0:
+            st.session_state.cart[item_id] -= 1
+            if st.session_state.cart[item_id] == 0:
+                del st.session_state.cart[item_id]
 
-# Helper functions
 def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
     return st.session_state.cart.get(item_id, 0)
@@ -222,31 +109,30 @@ menu_items = [
     }
 ]
 
-# Cart icon at the TOP-RIGHT (OUTSIDE columns layout)
+# Cart icon at top right
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
-
-# Shopping cart icon - placed directly at the top level before any columns
-st.markdown(f"""
-<div class="cart-fixed">
-    <div style="position: relative;">
-        <div class="cart-icon">
-            <svg viewBox="0 0 24 24">
+st.markdown(
+    f"""
+    <div class="cart-icon">
+        <div style="position: relative;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
+            {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
         </div>
-        {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
     </div>
-</div>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
 # Layout the app
 col1, col2 = st.columns([1, 3])
 
 with col1:
     # DISHCOVERY title
-    st.markdown('<h1 class="dishcovery-title">DISHCOVERY</h1>', unsafe_allow_html=True)
+    st.markdown('<h1>DISHCOVERY</h1>', unsafe_allow_html=True)
     
     # Member login section
     st.write("Please Input Customer ID")
@@ -263,66 +149,75 @@ with col1:
     # Sections after login in correct order: 1. Favorite Dishes, 2. Recommendation, 3. Allergic Food, 4. Customer Info
     if 'authenticated' in st.session_state and st.session_state.authenticated:
         # 1. Favorite Dishes section (first)
-        st.markdown('''
-        <div class="section-container">
-            <div class="section-header">
-                Favorite Dishes
+        st.markdown(
+            """
+            <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                    Favorite Dishes
+                </div>
+                <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                    <div>• Pad Thai</div>
+                    <div>• Green Curry</div>
+                </div>
             </div>
-            <div class="section-content">
-                <div>• Pad Thai</div>
-                <div>• Green Curry</div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+            """,
+            unsafe_allow_html=True
+        )
     
     # 2. Recommendation section (always shown, second position after login)
-    st.markdown('''
-    <div class="section-container">
-        <div class="section-header">
-            Recommendation
+    st.markdown(
+        """
+        <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Recommendation
+            </div>
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Omelette (new)</span>
+                    <span style="color: green;">100</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Fries Pork with Garlic</span>
+                    <span style="color: green;">99</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Som Tam</span>
+                    <span style="color: green;">80</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Satay</span>
+                    <span style="color: green;">30</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>test1</span>
+                    <span style="color: green;">30</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>test2</span>
+                    <span style="color: green;">30</span>
+                </div>
+            </div>
         </div>
-        <div class="section-content">
-            <div style="display: flex; justify-content: space-between;">
-                <span>Omelette (new)</span>
-                <span style="color: green;">100</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Fries Pork with Garlic</span>
-                <span style="color: green;">99</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Som Tam</span>
-                <span style="color: green;">80</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Satay</span>
-                <span style="color: green;">30</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>test1</span>
-                <span style="color: green;">30</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>test2</span>
-                <span style="color: green;">30</span>
-            </div>
-        </div>
-    </div>
-    ''', unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
     
     if 'authenticated' in st.session_state and st.session_state.authenticated:
         # 3. Allergic Food section (third position)
-        st.markdown('''
-        <div class="section-container">
-            <div class="section-header">
-                Allergic Food
+        st.markdown(
+            """
+            <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                    Allergic Food
+                </div>
+                <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                    <div>• Peanuts</div>
+                    <div>• Shellfish</div>
+                </div>
             </div>
-            <div class="section-content">
-                <div>• Peanuts</div>
-                <div>• Shellfish</div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+            """,
+            unsafe_allow_html=True
+        )
         
         # 4. Customer information at the bottom after the three sections
         st.write("Customer Information")
@@ -333,7 +228,14 @@ with col1:
 
 with col2:
     # Welcome banner
-    st.markdown('<div class="welcome-banner">Welcome</div>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div style="background-color: #e17a54; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+            Welcome
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     # Main Menu header
     st.markdown('## Main Menu')
@@ -345,38 +247,56 @@ with col2:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["All", "Main Dishes", "Soup", "Appetizers", "Drinks"])
     
     with tab1:  # Display all items in the All tab
-        for i, item in enumerate(menu_items):
-            container = st.container()
+        # For each menu item
+        for item in menu_items:
+            # Get quantity of this item
+            quantity = get_item_quantity(item["id"])
             
-            # Item layout with columns
-            cols = container.columns([1, 3, 1])
+            # Create 3 columns for layout
+            col_img, col_info, col_actions = st.columns([1, 3, 1])
             
-            with cols[0]:
+            # Column 1: Image
+            with col_img:
                 st.image(item["image"], width=100)
             
-            with cols[1]:
-                st.write(f"### {item['name']}")
+            # Column 2: Name and price
+            with col_info:
+                st.subheader(item["name"])
                 st.write(f"฿{item['price']}")
             
-            with cols[2]:
-                quantity = get_item_quantity(item["id"])
-                
-                # Display current quantity
+            # Column 3: Quantity and buttons
+            with col_actions:
+                # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # Get a unique ID for this item container
-                item_container_id = f"item_{item['id']}"
-                
-                # Add direct links for buttons that work exactly where they appear
+                # APPROACH WITHOUT NESTED COLUMNS
+                # Use URL parameters for button actions
+                # Show the visual buttons with HTML
                 st.markdown(f"""
-                <div style="position: relative; height: 40px; margin-top: 10px;">
-                    <!-- These buttons are actual links that trigger URL parameters -->
-                    <a href="?remove={item['id']}" style="text-decoration: none;">
-                        <div class="visible-button minus-btn">-</div>
-                    </a>
-                    <div class="quantity-value">{quantity}</div>
-                    <a href="?add={item['id']}" style="text-decoration: none;">
-                        <div class="visible-button plus-btn">+</div>
-                    </a>
+                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px;">
+                    <form action="?minus={item['id']}" method="get" target="_self" style="margin:0; padding:0;">
+                        <button type="submit" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white; margin-right: 10px;">-</button>
+                    </form>
+                    <span style="width: 20px; text-align: center;">{quantity}</span>
+                    <form action="?plus={item['id']}" method="get" target="_self" style="margin:0; padding:0;">
+                        <button type="submit" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white; margin-left: 10px;">+</button>
+                    </form>
                 </div>
                 """, unsafe_allow_html=True)
+
+# Handle URL parameters for button actions
+params = st.query_params
+
+if "plus" in params:
+    item_id = params["plus"][0]
+    add_to_cart(item_id)
+    # Clear parameter and refresh
+    del st.query_params["plus"]
+    st.rerun()
+
+if "minus" in params:
+    item_id = params["minus"][0]
+    remove_from_cart(item_id)
+    # Clear parameter and refresh
+    del st.query_params["minus"]
+    st.rerun()
