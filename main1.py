@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
-from PIL import Image
-import base64
 import json
-import os
 from datetime import datetime
 
 # Set page configuration
@@ -14,16 +11,17 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Simpler CSS focusing only on what we need
+# Minimal CSS
 st.markdown("""
 <style>
-    /* Basic styling */
+    /* DISHCOVERY title */
     .dishcovery-title {
         font-size: 2.5rem;
         font-weight: bold;
         color: #333;
     }
     
+    /* Welcome banner */
     .welcome-banner {
         background-color: #e17a54;
         color: white;
@@ -32,37 +30,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Critical part - quantity controls styling */
-    .quantity-container {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    
-    /* Hide default Streamlit styling for our buttons */
-    div.stButton > button {
-        border: 1px solid #ccc !important;
-        border-radius: 50% !important;
-        width: 30px !important;
-        height: 30px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        padding: 0 !important;
-        background-color: white !important;
-        color: #555 !important;
-    }
-    
-    /* Hide Streamlit elements we don't need */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stDeployButton {display:none;}
-    
-    /* Sections styling */
+    /* Side panel sections */
     .section-container {
         background-color: #e17a54;
         border-radius: 10px;
@@ -86,13 +54,27 @@ st.markdown("""
         border-radius: 10px;
         padding: 15px;
     }
+    
+    /* Cart button */
+    .cart-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    /* Hide Streamlit elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stDeployButton {display:none;}
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state - keep track of cart items
+# Initialize session state for cart
 if 'cart' not in st.session_state:
     st.session_state.cart = {}
 
+# Helper functions
 def add_to_cart(item_id):
     """Add an item to the cart"""
     if item_id in st.session_state.cart:
@@ -251,41 +233,55 @@ with col2:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["All", "Main Dishes", "Soup", "Appetizers", "Drinks"])
     
     with tab1:  # Display all items in the All tab
-        # Display menu items with SIMPLE quantity controls using native Streamlit buttons
         for item in menu_items:
-            with st.container():
-                cols = st.columns([1, 3, 1])
+            cols = st.columns([1, 3, 1])
+            
+            with cols[0]:
+                st.image(item["image"], width=100)
+            
+            with cols[1]:
+                st.write(f"### {item['name']}")
+                st.write(f"฿{item['price']}")
+            
+            # ULTRA SIMPLE: No nested columns, just direct button placement
+            with cols[2]:
+                quantity = get_item_quantity(item["id"])
                 
-                with cols[0]:
-                    st.image(item["image"], width=100)
+                # Display current quantity
+                st.write(f"Quantity: {quantity}")
                 
-                with cols[1]:
-                    st.subheader(item["name"])
-                    st.write(f"฿{item['price']}")
+                # Place the buttons side by side using HTML
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                    <form action="#" method="post">
+                        <button type="submit" name="minus" value="{item['id']}" 
+                                style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white;">
+                            -
+                        </button>
+                    </form>
+                    <span style="width: 20px; text-align: center;">{quantity}</span>
+                    <form action="#" method="post">
+                        <button type="submit" name="plus" value="{item['id']}" 
+                                style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #e17a54; background: white; color: #e17a54;">
+                            +
+                        </button>
+                    </form>
+                </div>
+                """, unsafe_allow_html=True)
                 
-                # FIX: Simple quantity controls using only Streamlit native elements
-                with cols[2]:
-                    quantity = get_item_quantity(item["id"])
-                    
-                    # Display current quantity
-                    st.write(f"Quantity: {quantity}")
-                    
-                    # Create buttons in a row using columns
-                    btn_cols = st.columns([1, 1])
-                    with btn_cols[0]:
-                        if st.button("-", key=f"minus_{item['id']}"):
-                            remove_from_cart(item["id"])
-                            # No rerun needed with this approach
-                    
-                    with btn_cols[1]:
-                        if st.button("+", key=f"plus_{item['id']}"):
-                            add_to_cart(item["id"])
-                            # No rerun needed with this approach
+                # Hidden buttons that actually perform the actions
+                minus_btn = st.button("-", key=f"minus_{item['id']}", help="Decrease quantity")
+                if minus_btn:
+                    remove_from_cart(item["id"])
+                
+                plus_btn = st.button("+", key=f"plus_{item['id']}", help="Increase quantity")
+                if plus_btn:
+                    add_to_cart(item["id"])
 
-# Cart button (simple version)
+# Cart button (fixed position)
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
 cart_html = f"""
-<div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+<div class="cart-button">
     <div style="position: relative;">
         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="9" cy="21" r="1"></circle>
@@ -297,3 +293,13 @@ cart_html = f"""
 </div>
 """
 st.markdown(cart_html, unsafe_allow_html=True)
+
+# Hidden handler for form submissions (for the visually styled buttons)
+form_data = st.experimental_get_query_params()
+if "minus" in form_data and form_data["minus"]:
+    item_id = form_data["minus"][0]
+    remove_from_cart(item_id)
+    
+if "plus" in form_data and form_data["plus"]:
+    item_id = form_data["plus"][0]
+    add_to_cart(item_id)
