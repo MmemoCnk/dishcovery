@@ -55,24 +55,11 @@ st.markdown("""
         padding: 15px;
     }
     
-    /* Hide default button styling */
-    .stButton > button {
-        display: none;
-    }
-    
-    /* Quantity controls - styled correctly */
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        margin-top: 10px;
-    }
-    
-    /* Cart icon styling */
-    .cart-button {
-        position: fixed;
-        top: 20px;
-        right: 20px;
+    /* Cart icon styling - FIXED positioning next to Welcome */
+    .cart-icon {
+        position: absolute;
+        top: 82px;
+        right: 30px;
         z-index: 1000;
     }
     
@@ -91,6 +78,22 @@ st.markdown("""
         justify-content: center;
         font-size: 12px;
         font-weight: bold;
+    }
+    
+    /* Styling for our custom quantity buttons */
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        background-color: white;
+        color: #333;
+        text-decoration: none;
     }
     
     /* Hide Streamlit elements */
@@ -119,24 +122,10 @@ def remove_from_cart(item_id):
             st.session_state.cart[item_id] -= 1
             if st.session_state.cart[item_id] == 0:
                 del st.session_state.cart[item_id]
-    
+
 def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
     return st.session_state.cart.get(item_id, 0)
-
-# Check for button clicks from the query parameters
-params = st.query_params
-if "add" in params:
-    item_id = params["add"]
-    add_to_cart(item_id)
-    # Clear the parameter to avoid repeated actions
-    del st.query_params["add"]
-    
-if "remove" in params:
-    item_id = params["remove"]
-    remove_from_cart(item_id)
-    # Clear the parameter to avoid repeated actions
-    del st.query_params["remove"]
 
 # Sample menu items
 menu_items = [
@@ -277,7 +266,7 @@ with col2:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["All", "Main Dishes", "Soup", "Appetizers", "Drinks"])
     
     with tab1:  # Display all items in the All tab
-        for item in menu_items:
+        for i, item in enumerate(menu_items):
             cols = st.columns([1, 3, 1])
             
             with cols[0]:
@@ -287,59 +276,40 @@ with col2:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
             
-            # The key fix - proper +/- buttons that look like the screenshot
+            # Key fix: Quantity controls with buttons that don't navigate
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
                 # Display current quantity
                 st.write(f"Quantity: {quantity}")
                 
-                # Hidden Streamlit buttons
-                minus_btn = st.button("-", key=f"minus_{item['id']}")
-                plus_btn = st.button("+", key=f"plus_{item['id']}")
+                # Two regular buttons for + and -
+                col_minus, col_plus = st.columns(2)
                 
-                # Custom HTML buttons that look exactly like your screenshot
-                st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
-                    <a href="?remove={item['id']}" style="text-decoration: none;">
-                        <div style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333;">
-                            -
-                        </div>
-                    </a>
-                    <div style="width: 30px; text-align: center;">{quantity}</div>
-                    <a href="?add={item['id']}" style="text-decoration: none;">
-                        <div style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333;">
-                            +
-                        </div>
-                    </a>
-                </div>
-                """, unsafe_allow_html=True)
+                with col_minus:
+                    if st.button("-", key=f"minus_{i}"):
+                        remove_from_cart(item["id"])
+                        st.rerun()
+                
+                with col_plus:
+                    if st.button("+", key=f"plus_{i}"):
+                        add_to_cart(item["id"])
+                        st.rerun()
 
-# Cart button with counter in top right
+# Cart icon with proper styling - positioned at the level of Welcome banner
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
 
 # Cart icon with proper styling and counter
 cart_html = f"""
-<div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+<div class="cart-icon">
     <div style="position: relative;">
-        <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" width="40" height="40" style="opacity: 0.8;">
-        {f'<span style="position: absolute; top: -8px; right: -8px; background-color: #e74c3c; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">{cart_count}</span>' if cart_count > 0 else ''}
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
     </div>
 </div>
 """
 st.markdown(cart_html, unsafe_allow_html=True)
-
-# JavaScript for auto-refresh after button clicks to update cart icon
-st.markdown("""
-<script>
-    // Make sure the page is refreshed when parameters are in the URL
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('add') || urlParams.has('remove')) {
-            // Clear parameters and reload
-            window.history.replaceState({}, document.title, window.location.pathname);
-            window.location.reload();
-        }
-    }
-</script>
-""", unsafe_allow_html=True)
