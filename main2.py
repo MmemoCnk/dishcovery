@@ -18,7 +18,7 @@ if 'cart' not in st.session_state:
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
-# Custom CSS - minimal to avoid conflicts
+# Custom CSS for cart icon and transparent buttons
 st.markdown("""
 <style>
     /* Cart icon at top right corner */
@@ -271,16 +271,41 @@ with col2:
                 # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # SIMPLER APPROACH: Just use basic Streamlit buttons
-                # Create one button for minus and one for plus
-                minus_btn = st.button("-", key=f"minus_{i}")
-                plus_btn = st.button("+", key=f"plus_{i}")
-                
-                # Handle button clicks
-                if minus_btn:
-                    remove_from_cart(item["id"])
-                    st.rerun()
-                
-                if plus_btn:
-                    add_to_cart(item["id"])
-                    st.rerun()
+                # NO NESTED COLUMNS: Just use URL parameters for buttons
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 10px;">
+                    <!-- Minus button as transparent box with - sign -->
+                    <a href="?minus={item['id']}" style="text-decoration: none;">
+                        <div style="width: 40px; height: 40px; border: 1px solid #ddd; border-radius: 8px; 
+                                    display: flex; align-items: center; justify-content: center; 
+                                    font-weight: bold; font-size: 20px; margin-right: 5px;">-</div>
+                    </a>
+                    
+                    <!-- Display quantity -->
+                    <span style="margin: 0 10px; font-weight: bold;">{quantity}</span>
+                    
+                    <!-- Plus button as transparent box with + sign -->
+                    <a href="?plus={item['id']}" style="text-decoration: none;">
+                        <div style="width: 40px; height: 40px; border: 1px solid #ddd; border-radius: 8px; 
+                                    display: flex; align-items: center; justify-content: center; 
+                                    font-weight: bold; font-size: 20px; margin-left: 5px;">+</div>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
+
+# Handle URL parameters for button actions
+params = st.query_params
+
+if "plus" in params:
+    item_id = params["plus"][0]
+    add_to_cart(item_id)
+    # Clear parameter and refresh
+    del st.query_params["plus"]
+    st.rerun()
+
+if "minus" in params:
+    item_id = params["minus"][0]
+    remove_from_cart(item_id)
+    # Clear parameter and refresh
+    del st.query_params["minus"]
+    st.rerun()
