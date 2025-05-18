@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for styling without relying on complex layouts
+# Custom CSS for styling
 st.markdown("""
 <style>
     /* DISHCOVERY title */
@@ -55,10 +55,10 @@ st.markdown("""
         padding: 15px;
     }
     
-    /* Cart icon styling - FIXED positioning next to Welcome */
+    /* Cart icon styling - Fixed at TOP right corner */
     .cart-icon {
         position: absolute;
-        top: 82px;
+        top: 20px; /* Move to top */
         right: 30px;
         z-index: 1000;
     }
@@ -80,26 +80,26 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Button styling */
-    .button-container {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
+    /* Menu quantity buttons */
+    .quantity-btn {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        background-color: white;
+        color: #333;
+        font-weight: bold;
+        text-align: center;
+        line-height: 30px;
+        cursor: pointer;
+        margin: 0 5px;
     }
     
-    .display-buttons button {
-        border-radius: 50% !important;
-        width: 30px !important;
-        height: 30px !important;
-        padding: 0 !important;
-        font-weight: bold !important;
-        background-color: white !important;
-        color: #333 !important;
-        border: 1px solid #ccc !important;
-        margin: 0 5px !important; 
-        box-shadow: none !important;
+    .quantity-value {
+        display: inline-block;
+        width: 30px;
+        text-align: center;
     }
     
     /* Hide Streamlit elements */
@@ -132,15 +132,6 @@ def remove_from_cart(item_id):
 def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
     return st.session_state.cart.get(item_id, 0)
-
-# Handle button clicks from session state
-if 'add_button_clicked' in st.session_state and st.session_state.add_button_clicked:
-    add_to_cart(st.session_state.add_button_clicked)
-    st.session_state.add_button_clicked = None  # Reset after handling
-
-if 'remove_button_clicked' in st.session_state and st.session_state.remove_button_clicked:
-    remove_from_cart(st.session_state.remove_button_clicked)
-    st.session_state.remove_button_clicked = None  # Reset after handling
 
 # Sample menu items
 menu_items = [
@@ -196,6 +187,10 @@ with col1:
     
     enter_btn = st.button("Enter")
     
+    # Set authenticated in session state
+    if enter_btn:
+        st.session_state.authenticated = True
+    
     # Always show Recommendation section (even before login)
     st.markdown('''
     <div class="section-container">
@@ -231,17 +226,9 @@ with col1:
     </div>
     ''', unsafe_allow_html=True)
     
-    # Customer information - visible after login
-    if enter_btn or ('authenticated' in st.session_state and st.session_state.authenticated):
-        st.session_state.authenticated = True
-        
-        st.write("Customer Information")
-        st.text_input("Name :", value="test1", disabled=True)
-        st.text_input("Surname :", value="test2", disabled=True)
-        current_date = "Sunday, March 2, 2025, 12:00"
-        st.write(f"Date & Time : {current_date}")
-        
-        # Favorite Dishes section (only after login)
+    # Block ordering: 1. Recommendation (always shown above), 2. Customer information, 3. Favorite Dishes, 4. Allergic Food
+    if 'authenticated' in st.session_state and st.session_state.authenticated:
+        # 1. Favorite Dishes section (only after login)
         st.markdown('''
         <div class="section-container">
             <div class="section-header">
@@ -254,7 +241,7 @@ with col1:
         </div>
         ''', unsafe_allow_html=True)
         
-        # Allergic Food section (only after login)
+        # 2. Allergic Food section (only after login)
         st.markdown('''
         <div class="section-container">
             <div class="section-header">
@@ -266,6 +253,13 @@ with col1:
             </div>
         </div>
         ''', unsafe_allow_html=True)
+        
+        # 3. Customer information at the bottom
+        st.write("Customer Information")
+        st.text_input("Name :", value="test1", disabled=True)
+        st.text_input("Surname :", value="test2", disabled=True)
+        current_date = "Sunday, March 2, 2025, 12:00"
+        st.write(f"Date & Time : {current_date}")
 
 with col2:
     # Welcome banner
@@ -281,7 +275,7 @@ with col2:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["All", "Main Dishes", "Soup", "Appetizers", "Drinks"])
     
     with tab1:  # Display all items in the All tab
-        for i, item in enumerate(menu_items):
+        for item in menu_items:
             cols = st.columns([1, 3, 1])
             
             with cols[0]:
@@ -291,42 +285,44 @@ with col2:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
             
-            # Key fix: Quantity controls WITHOUT nested columns
+            # Quantity controls
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
                 # Display current quantity
                 st.write(f"Quantity: {quantity}")
                 
-                # Define callback functions for the buttons
-                def on_minus_click(item_id=item["id"]):
-                    remove_from_cart(item_id)
-                    st.rerun()
+                # Use image buttons instead of interactive elements
+                # Generate unique form ID to enable multiple forms on the same page
+                form_id = f"form_{item['id']}"
                 
-                def on_plus_click(item_id=item["id"]):
-                    add_to_cart(item_id)
-                    st.rerun()
-                
-                # Use HTML for button layout but keep the buttons functional
-                st.markdown(f"""
-                <div class="display-buttons" style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>
-                            <button onclick="document.getElementById('minus_btn_{i}').click()">-</button>
-                        </span>
-                        <span style="width: 20px; text-align: center;">{quantity}</span>
-                        <span>
-                            <button onclick="document.getElementById('plus_btn_{i}').click()">+</button>
-                        </span>
+                # Create a form with buttons
+                with st.form(key=form_id, clear_on_submit=False):
+                    st.markdown(f"""
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        <div class="quantity-btn">-</div>
+                        <div class="quantity-value">{quantity}</div>
+                        <div class="quantity-btn">+</div>
                     </div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Hidden buttons that receive clicks
-                st.button("-", key=f"minus_btn_{i}", on_click=on_minus_click)
-                st.button("+", key=f"plus_btn_{i}", on_click=on_plus_click)
+                    """, unsafe_allow_html=True)
+                    
+                    # These buttons are hidden but functional
+                    cols = st.columns(2)
+                    with cols[0]:
+                        minus_btn = st.form_submit_button("-", help="Decrease quantity")
+                    with cols[1]:
+                        plus_btn = st.form_submit_button("+", help="Increase quantity")
+                    
+                    # Handle button clicks
+                    if minus_btn:
+                        remove_from_cart(item["id"])
+                        st.rerun()
+                    
+                    if plus_btn:
+                        add_to_cart(item["id"])
+                        st.rerun()
 
-# Cart icon with proper styling - positioned at the level of Welcome banner
+# Cart icon with proper styling - positioned at the TOP right corner (fixed)
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
 
 # Cart icon with proper styling and counter
