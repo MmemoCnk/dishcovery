@@ -191,7 +191,22 @@ with col1:
     if enter_btn:
         st.session_state.authenticated = True
     
-    # Always show Recommendation section (even before login)
+    # Sections after login in correct order: 1. Favorite Dishes, 2. Recommendation, 3. Allergic Food, 4. Customer Info
+    if 'authenticated' in st.session_state and st.session_state.authenticated:
+        # 1. Favorite Dishes section (first)
+        st.markdown('''
+        <div class="section-container">
+            <div class="section-header">
+                Favorite Dishes
+            </div>
+            <div class="section-content">
+                <div>• Pad Thai</div>
+                <div>• Green Curry</div>
+            </div>
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    # 2. Recommendation section (always shown, second position after login)
     st.markdown('''
     <div class="section-container">
         <div class="section-header">
@@ -226,22 +241,8 @@ with col1:
     </div>
     ''', unsafe_allow_html=True)
     
-    # Block ordering: 1. Recommendation (always shown above), 2. Customer information, 3. Favorite Dishes, 4. Allergic Food
     if 'authenticated' in st.session_state and st.session_state.authenticated:
-        # 1. Favorite Dishes section (only after login)
-        st.markdown('''
-        <div class="section-container">
-            <div class="section-header">
-                Favorite Dishes
-            </div>
-            <div class="section-content">
-                <div>• Pad Thai</div>
-                <div>• Green Curry</div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        # 2. Allergic Food section (only after login)
+        # 3. Allergic Food section (third position)
         st.markdown('''
         <div class="section-container">
             <div class="section-header">
@@ -254,7 +255,7 @@ with col1:
         </div>
         ''', unsafe_allow_html=True)
         
-        # 3. Customer information at the bottom
+        # 4. Customer information at the bottom after the three sections
         st.write("Customer Information")
         st.text_input("Name :", value="test1", disabled=True)
         st.text_input("Surname :", value="test2", disabled=True)
