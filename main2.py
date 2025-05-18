@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Improved CSS with focus on +/- buttons and cart icon
+# Custom CSS for styling without relying on complex layouts
 st.markdown("""
 <style>
     /* DISHCOVERY title */
@@ -80,20 +80,26 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Styling for our custom quantity buttons */
-    .quantity-btn {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        display: inline-flex;
+    /* Button styling */
+    .button-container {
+        display: flex;
+        justify-content: flex-end;
         align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        cursor: pointer;
-        background-color: white;
-        color: #333;
-        text-decoration: none;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .display-buttons button {
+        border-radius: 50% !important;
+        width: 30px !important;
+        height: 30px !important;
+        padding: 0 !important;
+        font-weight: bold !important;
+        background-color: white !important;
+        color: #333 !important;
+        border: 1px solid #ccc !important;
+        margin: 0 5px !important; 
+        box-shadow: none !important;
     }
     
     /* Hide Streamlit elements */
@@ -126,6 +132,15 @@ def remove_from_cart(item_id):
 def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
     return st.session_state.cart.get(item_id, 0)
+
+# Handle button clicks from session state
+if 'add_button_clicked' in st.session_state and st.session_state.add_button_clicked:
+    add_to_cart(st.session_state.add_button_clicked)
+    st.session_state.add_button_clicked = None  # Reset after handling
+
+if 'remove_button_clicked' in st.session_state and st.session_state.remove_button_clicked:
+    remove_from_cart(st.session_state.remove_button_clicked)
+    st.session_state.remove_button_clicked = None  # Reset after handling
 
 # Sample menu items
 menu_items = [
@@ -276,25 +291,40 @@ with col2:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
             
-            # Key fix: Quantity controls with buttons that don't navigate
+            # Key fix: Quantity controls WITHOUT nested columns
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
                 # Display current quantity
                 st.write(f"Quantity: {quantity}")
                 
-                # Two regular buttons for + and -
-                col_minus, col_plus = st.columns(2)
+                # Define callback functions for the buttons
+                def on_minus_click(item_id=item["id"]):
+                    remove_from_cart(item_id)
+                    st.rerun()
                 
-                with col_minus:
-                    if st.button("-", key=f"minus_{i}"):
-                        remove_from_cart(item["id"])
-                        st.rerun()
+                def on_plus_click(item_id=item["id"]):
+                    add_to_cart(item_id)
+                    st.rerun()
                 
-                with col_plus:
-                    if st.button("+", key=f"plus_{i}"):
-                        add_to_cart(item["id"])
-                        st.rerun()
+                # Use HTML for button layout but keep the buttons functional
+                st.markdown(f"""
+                <div class="display-buttons" style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>
+                            <button onclick="document.getElementById('minus_btn_{i}').click()">-</button>
+                        </span>
+                        <span style="width: 20px; text-align: center;">{quantity}</span>
+                        <span>
+                            <button onclick="document.getElementById('plus_btn_{i}').click()">+</button>
+                        </span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Hidden buttons that receive clicks
+                st.button("-", key=f"minus_btn_{i}", on_click=on_minus_click)
+                st.button("+", key=f"plus_btn_{i}", on_click=on_plus_click)
 
 # Cart icon with proper styling - positioned at the level of Welcome banner
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
