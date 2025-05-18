@@ -15,7 +15,7 @@ st.set_page_config(
 if 'cart' not in st.session_state:
     st.session_state.cart = {}
 
-# Custom CSS to position the cart icon
+# Custom CSS to position the cart icon and make buttons more clickable
 st.markdown("""
 <style>
     /* Cart icon at top right corner */
@@ -43,11 +43,89 @@ st.markdown("""
         font-weight: bold;
     }
     
+    /* Make the real buttons completely invisible */
+    div.stButton {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+    
+    /* Style for the circular buttons */
+    .qty-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        background-color: white;
+        color: #333;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 0 5px;
+        user-select: none;
+    }
+    
+    /* Quantity display */
+    .qty-display {
+        display: inline-block;
+        width: 20px;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    /* Container to make positioning easier */
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+    
+    /* Hide the invisible link rectangles */
+    .hidden-link {
+        display: none !important;
+    }
+    
     /* Hide Streamlit elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .stDeployButton {display:none;}
 </style>
+""", unsafe_allow_html=True)
+
+# Add JavaScript to ensure buttons are clickable where they visually appear
+st.markdown("""
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all quantity buttons
+    const minusButtons = document.querySelectorAll('.minus-btn');
+    const plusButtons = document.querySelectorAll('.plus-btn');
+    
+    // Make them clickable by forwarding clicks to the real hidden buttons
+    minusButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const hiddenBtn = document.querySelector(`button[key="minus_${itemId}"]`);
+            if (hiddenBtn) hiddenBtn.click();
+        });
+    });
+    
+    plusButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const hiddenBtn = document.querySelector(`button[key="plus_${itemId}"]`);
+            if (hiddenBtn) hiddenBtn.click();
+        });
+    });
+});
+</script>
 """, unsafe_allow_html=True)
 
 # Helper functions for cart management
@@ -248,7 +326,7 @@ with col2:
     
     with tab1:  # Display all items in the All tab
         # For each menu item
-        for item in menu_items:
+        for i, item in enumerate(menu_items):
             # Get quantity of this item
             quantity = get_item_quantity(item["id"])
             
@@ -269,34 +347,25 @@ with col2:
                 # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # APPROACH WITHOUT NESTED COLUMNS
-                # Use URL parameters for button actions
-                # Show the visual buttons with HTML
+                # Create the buttons that look like buttons but don't show in the wrong place
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px;">
-                    <form action="?minus={item['id']}" method="get" target="_self" style="margin:0; padding:0;">
-                        <button type="submit" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white; margin-right: 10px;">-</button>
-                    </form>
-                    <span style="width: 20px; text-align: center;">{quantity}</span>
-                    <form action="?plus={item['id']}" method="get" target="_self" style="margin:0; padding:0;">
-                        <button type="submit" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: white; margin-left: 10px;">+</button>
-                    </form>
+                <div class="quantity-controls">
+                    <!-- This visible div is the actual button users will click -->
+                    <div class="qty-btn minus-btn" data-item-id="{i}">-</div>
+                    <div class="qty-display">{quantity}</div>
+                    <div class="qty-btn plus-btn" data-item-id="{i}">+</div>
+                </div>
+                <div class="hidden-link">
+                    <!-- Hide any links or wrong boxes that might appear -->
                 </div>
                 """, unsafe_allow_html=True)
-
-# Handle URL parameters for button actions
-params = st.query_params
-
-if "plus" in params:
-    item_id = params["plus"][0]
-    add_to_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["plus"]
-    st.rerun()
-
-if "minus" in params:
-    item_id = params["minus"][0]
-    remove_from_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["minus"]
-    st.rerun()
+                
+                # Hidden buttons that handle the actual functionality
+                # These are positioned off-screen but still functional
+                if st.button("-", key=f"minus_{i}"):
+                    remove_from_cart(item["id"])
+                    st.rerun()
+                
+                if st.button("+", key=f"plus_{i}"):
+                    add_to_cart(item["id"])
+                    st.rerun()
