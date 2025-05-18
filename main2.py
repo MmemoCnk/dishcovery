@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import json
 from datetime import datetime
 
 # Set page configuration
@@ -15,7 +14,11 @@ st.set_page_config(
 if 'cart' not in st.session_state:
     st.session_state.cart = {}
 
-# Custom CSS to position the cart icon
+# Initialize authentication status
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+# Custom CSS - minimal to avoid conflicts
 st.markdown("""
 <style>
     /* Cart icon at top right corner */
@@ -109,23 +112,6 @@ menu_items = [
     }
 ]
 
-# Handle URL parameters for button actions
-params = st.query_params
-
-if "plus" in params:
-    item_id = params["plus"][0]
-    add_to_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["plus"]
-    st.rerun()
-
-if "minus" in params:
-    item_id = params["minus"][0]
-    remove_from_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["minus"]
-    st.rerun()
-
 # Cart icon at top right
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
 st.markdown(
@@ -157,31 +143,13 @@ with col1:
     member_id = st.text_input("Member ID", value="1111")
     phone = st.text_input("Tel number", value="1111")
     
-    enter_btn = st.button("Enter")
-    
-    # Set authenticated in session state
-    if enter_btn:
+    # IMPORTANT: Keep the Enter button functional
+    enter_button = st.button("Enter", key="login_button")
+    if enter_button:
         st.session_state.authenticated = True
+        st.success("Login successful!")
     
-    # Sections after login in correct order: 1. Favorite Dishes, 2. Recommendation, 3. Allergic Food, 4. Customer Info
-    if 'authenticated' in st.session_state and st.session_state.authenticated:
-        # 1. Favorite Dishes section (first)
-        st.markdown(
-            """
-            <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                    Favorite Dishes
-                </div>
-                <div style="background-color: white; border-radius: 10px; padding: 15px;">
-                    <div>• Pad Thai</div>
-                    <div>• Green Curry</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    
-    # 2. Recommendation section (always shown, second position after login)
+    # Always show Recommendation
     st.markdown(
         """
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
@@ -219,8 +187,25 @@ with col1:
         unsafe_allow_html=True
     )
     
-    if 'authenticated' in st.session_state and st.session_state.authenticated:
-        # 3. Allergic Food section (third position)
+    # Show these sections only after login
+    if st.session_state.authenticated:
+        # 1. Favorite Dishes section
+        st.markdown(
+            """
+            <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                    Favorite Dishes
+                </div>
+                <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                    <div>• Pad Thai</div>
+                    <div>• Green Curry</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # 2. Allergic Food section
         st.markdown(
             """
             <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
@@ -236,7 +221,7 @@ with col1:
             unsafe_allow_html=True
         )
         
-        # 4. Customer information at the bottom after the three sections
+        # 3. Customer information
         st.write("Customer Information")
         st.text_input("Name :", value="test1", disabled=True)
         st.text_input("Surname :", value="test2", disabled=True)
@@ -265,7 +250,7 @@ with col2:
     
     with tab1:  # Display all items in the All tab
         # For each menu item
-        for item in menu_items:
+        for i, item in enumerate(menu_items):
             # Get quantity of this item
             quantity = get_item_quantity(item["id"])
             
@@ -286,20 +271,16 @@ with col2:
                 # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # DIRECT LINKS approach for the buttons - these will work without JS
-                # These are styled to look exactly like the circular buttons in the screenshot
-                st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px;">
-                    <a href="?minus={item['id']}" style="text-decoration: none;">
-                        <div style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; 
-                                    background-color: white; display: flex; align-items: center; 
-                                    justify-content: center; font-weight: bold; margin-right: 10px;">-</div>
-                    </a>
-                    <div style="width: 30px; text-align: center;">{quantity}</div>
-                    <a href="?plus={item['id']}" style="text-decoration: none;">
-                        <div style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; 
-                                    background-color: white; display: flex; align-items: center; 
-                                    justify-content: center; font-weight: bold; margin-left: 10px;">+</div>
-                    </a>
-                </div>
-                """, unsafe_allow_html=True)
+                # SIMPLER APPROACH: Just use basic Streamlit buttons
+                # Create one button for minus and one for plus
+                minus_btn = st.button("-", key=f"minus_{i}")
+                plus_btn = st.button("+", key=f"plus_{i}")
+                
+                # Handle button clicks
+                if minus_btn:
+                    remove_from_cart(item["id"])
+                    st.rerun()
+                
+                if plus_btn:
+                    add_to_cart(item["id"])
+                    st.rerun()
