@@ -18,6 +18,37 @@ if 'cart' not in st.session_state:
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
+# Track clicked button without using URL parameters
+if 'button_clicked' not in st.session_state:
+    st.session_state.button_clicked = None
+    
+# Helper functions for cart management
+def add_to_cart(item_id):
+    """Add an item to the cart"""
+    if item_id in st.session_state.cart:
+        st.session_state.cart[item_id] += 1
+    else:
+        st.session_state.cart[item_id] = 1
+
+def remove_from_cart(item_id):
+    """Remove an item from the cart"""
+    if item_id in st.session_state.cart:
+        if st.session_state.cart[item_id] > 0:
+            st.session_state.cart[item_id] -= 1
+            if st.session_state.cart[item_id] == 0:
+                del st.session_state.cart[item_id]
+
+def get_item_quantity(item_id):
+    """Get the quantity of an item in the cart"""
+    return st.session_state.cart.get(item_id, 0)
+
+# Functions to handle button clicks through JavaScript
+def on_plus_click(item_id):
+    add_to_cart(item_id)
+    
+def on_minus_click(item_id):
+    remove_from_cart(item_id)
+
 # Custom CSS for cart icon
 st.markdown("""
 <style>
@@ -50,38 +81,13 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .stDeployButton {display:none;}
+    
+    /* Hide actual buttons */
+    div.row-widget.stButton {
+        display: none;
+    }
 </style>
 """, unsafe_allow_html=True)
-
-# Helper functions for cart management
-def add_to_cart(item_id):
-    """Add an item to the cart"""
-    if item_id in st.session_state.cart:
-        st.session_state.cart[item_id] += 1
-    else:
-        st.session_state.cart[item_id] = 1
-
-def remove_from_cart(item_id):
-    """Remove an item from the cart"""
-    if item_id in st.session_state.cart:
-        if st.session_state.cart[item_id] > 0:
-            st.session_state.cart[item_id] -= 1
-            if st.session_state.cart[item_id] == 0:
-                del st.session_state.cart[item_id]
-
-def get_item_quantity(item_id):
-    """Get the quantity of an item in the cart"""
-    return st.session_state.cart.get(item_id, 0)
-
-# Track which button was clicked
-if 'last_clicked' not in st.session_state:
-    st.session_state.last_clicked = None
-
-def set_clicked_minus(item_id):
-    st.session_state.last_clicked = f"minus_{item_id}"
-
-def set_clicked_plus(item_id):
-    st.session_state.last_clicked = f"plus_{item_id}"
 
 # Sample menu items
 menu_items = [
@@ -121,15 +127,6 @@ menu_items = [
         "category": "main"
     }
 ]
-
-# Process any button clicks from the previous render
-if st.session_state.last_clicked:
-    action, item_id = st.session_state.last_clicked.split('_')
-    if action == 'minus':
-        remove_from_cart(item_id)
-    elif action == 'plus':
-        add_to_cart(item_id)
-    st.session_state.last_clicked = None
 
 # Cart icon at top right
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
@@ -290,37 +287,20 @@ with col2:
                 # Display quantity first
                 st.write(f"Quantity: {quantity}")
                 
-                # SIMPLEST approach - just put buttons in a row with text
-                # Use URL parameters since they actually work
+                # Create real Streamlit buttons (will be hidden by CSS)
+                # These buttons use session state callbacks instead of URL parameters
+                st.button("-", key=f"minus_{i}", on_click=on_minus_click, args=(item["id"],))
+                st.button("+", key=f"plus_{i}", on_click=on_plus_click, args=(item["id"],))
+                
+                # Just show visual buttons with the quantity in between - this is what the user sees
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
-                    <a href="?minus={item['id']}" style="text-decoration: none;">
-                        <div style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px; 
-                                  display: flex; align-items: center; justify-content: center; 
-                                  font-weight: bold; font-size: 16px;">-</div>
-                    </a>
-                    <span style="font-weight: bold; width: 20px; text-align: center;">{quantity}</span>
-                    <a href="?plus={item['id']}" style="text-decoration: none;">
-                        <div style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px; 
-                                  display: flex; align-items: center; justify-content: center; 
-                                  font-weight: bold; font-size: 16px;">+</div>
-                    </a>
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
+                    <button onclick="document.querySelector('button[key=minus_{i}]').click()"
+                            style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px; 
+                                  background-color: white; cursor: pointer; font-size: 16px; font-weight: bold;">-</button>
+                    <span style="margin: 0 10px; width: 20px; text-align: center; font-weight: bold;">{quantity}</span>
+                    <button onclick="document.querySelector('button[key=plus_{i}]').click()"
+                            style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px; 
+                                  background-color: white; cursor: pointer; font-size: 16px; font-weight: bold;">+</button>
                 </div>
                 """, unsafe_allow_html=True)
-
-# Handle URL parameters for button actions
-params = st.query_params
-
-if "plus" in params:
-    item_id = params["plus"][0]
-    add_to_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["plus"]
-    st.rerun()
-
-if "minus" in params:
-    item_id = params["minus"][0]
-    remove_from_cart(item_id)
-    # Clear parameter and refresh
-    del st.query_params["minus"]
-    st.rerun()
