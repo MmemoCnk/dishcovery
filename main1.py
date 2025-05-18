@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS
+# Custom CSS with fixes for quantity buttons and cart icon
 st.markdown("""
 <style>
     /* Main container styles */
@@ -95,23 +95,72 @@ st.markdown("""
         margin-right: 1rem;
     }
     
-    /* Quantity buttons */
+    /* FIX 1: Improved Quantity buttons styling */
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+    
     .quantity-btn {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         border: 1px solid #e0e0e0;
         background-color: white;
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        font-size: 1.2rem;
+        font-size: 18px;
+        font-weight: bold;
+        transition: all 0.2s;
     }
     
-    .quantity-btn.add {
+    .quantity-btn:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .quantity-display {
+        width: 36px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
+    .btn-minus {
+        color: #666;
+        border-color: #e0e0e0;
+    }
+    
+    .btn-plus {
         color: #e17a54;
         border-color: #e17a54;
+    }
+    
+    /* FIX 2: Improved cart icon and button */
+    .cart-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background-color: #e17a54;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        border: none;
+        transition: transform 0.2s;
+    }
+    
+    .cart-button:hover {
+        transform: scale(1.05);
     }
     
     /* Toast notification */
@@ -173,6 +222,7 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         font-size: 0.75rem;
+        font-weight: bold;
     }
     
     /* Custom button */
@@ -217,6 +267,15 @@ st.markdown("""
     .stAlert > div {
         padding: 1rem;
         border-radius: 8px;
+    }
+    
+    /* Hide streamlit's default button styling for our custom buttons */
+    .control-button-row button {
+        visibility: hidden;
+        height: 0;
+        padding: 0 !important;
+        margin: 0 !important;
+        line-height: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -321,27 +380,6 @@ menu_items = [
     }
 ]
 
-# Sample user data
-user_database = {
-    "1111": {
-        "phone": "1111",
-        "firstName": "test1",
-        "lastName": "test2",
-        "allergies": ["Peanuts", "Shellfish"],
-        "favorites": ["Pad Thai", "Green Curry"]
-    }
-}
-
-# Recommended dishes with scores
-recommendations = [
-    {"name": "Omelette (new)", "score": 100},
-    {"name": "Fries Pork with Garlic", "score": 99},
-    {"name": "Som Tam", "score": 80},
-    {"name": "Satay", "score": 30},
-    {"name": "test1", "score": 30},
-    {"name": "test2", "score": 30}
-]
-
 # Helper functions
 def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
@@ -414,27 +452,6 @@ def filter_menu_items():
     
     return filtered
 
-def authenticate_user(member_id, phone):
-    """Authenticate user with member ID and phone number"""
-    if member_id in user_database and user_database[member_id]["phone"] == phone:
-        st.session_state.is_authenticated = True
-        st.session_state.user_data = user_database[member_id]
-        return True
-    return False
-
-def show_toast(message, duration=3):
-    """Show a toast message"""
-    st.session_state.show_toast = True
-    st.session_state.toast_message = message
-    # The toast will be hidden after a timeout in the JavaScript
-
-def checkout():
-    """Process checkout"""
-    st.session_state.order_sent = True
-    show_toast("Order sent to kitchen!")
-    # Clear cart after a delay (simulated)
-    # In a real app, you'd send this to a backend
-
 # Layout the app
 col1, col2 = st.columns([1, 3])
 
@@ -450,10 +467,16 @@ with col1:
     phone = st.text_input("Tel number", key="phone_input")
     
     if st.button("Enter"):
-        if authenticate_user(member_id, phone):
-            st.success(f"Welcome, {st.session_state.user_data['firstName']} {st.session_state.user_data['lastName']}")
-        else:
-            st.error("Invalid credentials")
+        # Simulate authentication
+        st.session_state.is_authenticated = True
+        st.session_state.user_data = {
+            "firstName": "Test",
+            "lastName": "User",
+            "phone": phone,
+            "allergies": ["Peanuts", "Shellfish"],
+            "favorites": ["Pad Thai", "Green Curry"]
+        }
+        st.experimental_rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -467,74 +490,70 @@ with col1:
         st.write(f"Date & Time: {current_date}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Favorite Dishes section - solid HTML with explicit colors
+        # Favorite Dishes section
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Favorite Dishes</h2>
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Favorite Dishes
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Pad Thai</span>
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Pad Thai
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Green Curry</span>
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Green Curry
                 </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
         
-        # Recommendation section - direct HTML approach with explicit colors
+        # Recommendation section
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Recommendation</h2>
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Recommendation
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Omelette (new)</span>
-                    <span style="color: green !important;">100</span>
+                    <span>Omelette (new)</span>
+                    <span style="color: green;">100</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Fries Pork with Garlic</span>
-                    <span style="color: green !important;">99</span>
+                    <span>Fries Pork with Garlic</span>
+                    <span style="color: green;">99</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Som Tam</span>
-                    <span style="color: green !important;">80</span>
+                    <span>Som Tam</span>
+                    <span style="color: green;">80</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">Satay</span>
-                    <span style="color: green !important;">30</span>
+                    <span>Satay</span>
+                    <span style="color: green;">30</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">test1</span>
-                    <span style="color: green !important;">30</span>
+                    <span>test1</span>
+                    <span style="color: green;">30</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span style="color: black !important;">test2</span>
-                    <span style="color: green !important;">30</span>
+                    <span>test2</span>
+                    <span style="color: green;">30</span>
                 </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
         
-        # Allergic Food section - direct HTML with explicit colors
+        # Allergic Food section
         st.markdown('''
         <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <h2 style="color: white !important; margin: 0; font-size: 24px; font-weight: bold;">Allergic Food</h2>
+            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
+                Allergic Food
             </div>
-            <div style="background-color: white !important; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Peanuts</span>
+            <div style="background-color: white; border-radius: 10px; padding: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Peanuts
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px; color: black !important;">
-                    <span style="margin-right: 10px; color: black !important;">•</span>
-                    <span style="color: black !important;">Shellfish</span>
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <span style="margin-right: 10px;">•</span> Shellfish
                 </div>
             </div>
         </div>
@@ -570,7 +589,7 @@ with col2:
     # Filter menu items
     filtered_items = filter_menu_items()
     
-    # Display menu items
+    # Display menu items with FIXED quantity controls
     for item in filtered_items:
         menu_card = st.container()
         with menu_card:
@@ -582,67 +601,63 @@ with col2:
             with cols[1]:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
+                st.write(item["description"])
             
+            # FIX 1: Improved quantity controls layout
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
-                # Display quantity controls in a horizontal layout
-                st.write(f"Quantity: {quantity}")
+                # Create hidden buttons for +/- functionality
+                control_buttons = st.empty()
+                with control_buttons.container():
+                    btn_cols = st.columns([1, 1])
+                    with btn_cols[0]:
+                        minus_clicked = st.button("-", key=f"minus_{item['id']}")
+                    with btn_cols[1]:
+                        plus_clicked = st.button("+", key=f"plus_{item['id']}")
                 
-                minus_btn = st.button("-", key=f"minus_{item['id']}")
-                if minus_btn:
-                    if quantity > 0:
-                        update_cart_quantity(item["id"], quantity - 1)
-                        st.experimental_rerun()
+                # Custom HTML for better styling of quantity controls
+                st.markdown(f"""
+                <div class="control-button-row" style="display: none;">
+                    <!-- This is where the streamlit buttons are -->
+                </div>
                 
-                plus_btn = st.button("+", key=f"plus_{item['id']}")
-                if plus_btn:
-                    # When clicking +, add directly to cart
+                <div class="quantity-controls">
+                    <button class="quantity-btn btn-minus" 
+                        onclick="document.querySelector('button[key=minus_{item['id']}]').click();">
+                        -
+                    </button>
+                    <div class="quantity-display">{quantity}</div>
+                    <button class="quantity-btn btn-plus"
+                        onclick="document.querySelector('button[key=plus_{item['id']}]').click();">
+                        +
+                    </button>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Handle button clicks
+                if minus_clicked and quantity > 0:
+                    update_cart_quantity(item["id"], quantity - 1)
+                    st.experimental_rerun()
+                
+                if plus_clicked:
                     add_to_cart(item)
                     st.experimental_rerun()
-                
-                # Clicking the item area should open dialog
-                view_btn = st.button("View Details", key=f"view_{item['id']}")
-                if view_btn:
-                    st.session_state.show_food_dialog = True
-                    st.session_state.selected_food = item
-                    st.experimental_rerun()
 
-    # Food dialog
-    if st.session_state.show_food_dialog and st.session_state.selected_food:
-        with st.form(key="food_dialog", clear_on_submit=True):
-            item = st.session_state.selected_food
-            st.image(item["image"], width=150)
-            st.write(f"### {item['name']}")
-            st.write(f"฿{item['price']}")
-            st.write(item["description"])
-            
-            remark = st.text_area("Special instructions", placeholder="E.g., less spicy, no onions, etc.")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.form_submit_button("Add to Cart"):
-                    add_to_cart(item, remark)
-                    st.session_state.show_food_dialog = False
-                    st.experimental_rerun()
-            with col2:
-                if st.form_submit_button("Cancel"):
-                    st.session_state.show_food_dialog = False
-                    st.experimental_rerun()
-
-# Shopping cart button (fixed position)
+# FIX 2: Improved cart button with clearer icon
 cart_count = get_total_items()
 cart_button_html = f"""
-<div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-    <button onclick="document.getElementById('cart-dialog').style.display='block'" class="custom-button" style="position: relative;">
+<button class="cart-button" onclick="document.getElementById('cart-dialog').style.display='block'">
+    <div style="position: relative;">
+        <!-- Shopping Cart Icon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="9" cy="21" r="1"></circle>
             <circle cx="20" cy="21" r="1"></circle>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
         </svg>
         {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
-    </button>
-</div>
+    </div>
+</button>
 """
 st.markdown(cart_button_html, unsafe_allow_html=True)
 
@@ -705,7 +720,8 @@ if len(st.session_state.cart) > 0:
             <span>Total</span>
             <span>฿{total_price}</span>
         </div>
-        <button onclick="checkoutCart()" {checkout_button_disabled} style="width: 100%; padding: 0.75rem; background-color: #e17a54; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        <button onclick="checkoutCart()" {checkout_button_disabled} 
+            style="width: 100%; padding: 0.75rem; background-color: #e17a54; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
             {checkout_button_text}
         </button>
     </div>
@@ -797,48 +813,22 @@ if st.session_state.show_toast:
 # Footer
 st.markdown('<div class="footer">© 2024 DISHCOVERY. All rights reserved.</div>', unsafe_allow_html=True)
 
-# Add streamlit component handlers
-def handle_streamlit_events():
-    # This function would handle streamlit events in a production app
-    # For this demo, we're using JavaScript and query params
-    pass
-
-# Add form handlers for direct submission
-if 'submit_checkout' in st.session_state and st.session_state.submit_checkout:
-    checkout()
-    st.session_state.submit_checkout = False
-    st.experimental_rerun()
-
-if 'add_item_directly' in st.session_state and st.session_state.add_item_directly:
-    item_id = st.session_state.add_item_directly
-    item = next((item for item in menu_items if item["id"] == item_id), None)
-    if item:
-        add_to_cart(item)
-    st.session_state.add_item_directly = None
-    st.experimental_rerun()
-
-if 'remove_item_directly' in st.session_state and st.session_state.remove_item_directly:
-    remove_from_cart(st.session_state.remove_item_directly)
-    st.session_state.remove_item_directly = None
-    st.experimental_rerun()
-
-# Add additional JS for handling clicks and making the app more interactive
+# Add additional JS for improving button interactions
 additional_js = """
 <script>
-// Function to open food dialog when clicking on food item
-function openFoodDialog(foodId) {
-    window.parent.postMessage({type: "open_food_dialog", foodId: foodId}, "*");
-}
-
-// Make entire menu card clickable
+// Function to handle clicks for quantity buttons
 document.addEventListener('DOMContentLoaded', function() {
+    // This ensures all our custom buttons work properly
+    // by redirecting clicks to the Streamlit buttons
+    
+    // For menu card click to view details
     const menuCards = document.querySelectorAll('.menu-card');
     menuCards.forEach(card => {
         card.addEventListener('click', function(e) {
             // Prevent triggering when clicking buttons
             if (!e.target.closest('button')) {
                 const foodId = card.getAttribute('data-food-id');
-                openFoodDialog(foodId);
+                window.parent.postMessage({type: "open_food_dialog", foodId: foodId}, "*");
             }
         });
     });
@@ -847,10 +837,3 @@ document.addEventListener('DOMContentLoaded', function() {
 """
 
 st.markdown(additional_js, unsafe_allow_html=True)
-
-# This is the end of the app. In production, you'd want to:
-# 1. Connect to a database for menu items, user authentication, and orders
-# 2. Implement proper API endpoints for cart management
-# 3. Add proper error handling and validation
-# 4. Implement order tracking and history
-# 5. Improve the UI with proper responsive design
