@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS with VERY SPECIFIC fixes for the buttons and cart
+# CSS for styling - focus on making buttons work exactly where they appear
 st.markdown("""
 <style>
     /* DISHCOVERY title */
@@ -91,25 +91,41 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* FORCE button styling for +/- */
-    button.plus-minus-btn {
-        display: inline-block !important;
-        width: 30px !important;
-        height: 30px !important;
-        border-radius: 50% !important;
-        border: 1px solid #ccc !important;
-        background-color: white !important;
-        color: #333 !important;
-        font-weight: bold !important;
-        padding: 0 !important;
-        margin: 0 5px !important;
-        cursor: pointer !important;
+    /* CRITICAL: Hide the original Streamlit buttons completely */
+    div.stButton {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
     }
     
-    /* Force quantity display styling */
-    .quantity-display {
-        display: inline-block;
+    /* Style for our visible buttons - these are separate HTML elements */
+    .visible-button {
         width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: white;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        position: absolute;
+        z-index: 100;
+    }
+    
+    .minus-btn {
+        right: 70px; /* Position the minus button */
+    }
+    
+    .plus-btn {
+        right: 30px; /* Position the plus button */
+    }
+    
+    .quantity-value {
+        position: absolute;
+        right: 50px;
+        width: 20px;
         text-align: center;
     }
     
@@ -120,26 +136,49 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# JavaScript for positioning buttons exactly over where they appear
+st.markdown("""
+<script>
+    // Function to position buttons precisely after everything is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // This runs after the page is fully loaded
+        setTimeout(function() {
+            // Your positioning code here if needed
+            console.log('Page fully loaded, adjusting button positions');
+        }, 1000);
+    });
+</script>
+""", unsafe_allow_html=True)
+
 # Initialize session state for cart
 if 'cart' not in st.session_state:
     st.session_state.cart = {}
 
-# Helper functions
-def add_to_cart(item_id):
-    """Add an item to the cart"""
+# Handle button clicks via custom parameters
+params = st.query_params
+if 'add' in params:
+    item_id = params.get('add')[0]
+    # Add item to cart
     if item_id in st.session_state.cart:
         st.session_state.cart[item_id] += 1
     else:
         st.session_state.cart[item_id] = 1
+    # Clear parameter
+    del st.query_params['add']
+    st.rerun()
 
-def remove_from_cart(item_id):
-    """Remove an item from the cart"""
-    if item_id in st.session_state.cart:
-        if st.session_state.cart[item_id] > 0:
-            st.session_state.cart[item_id] -= 1
-            if st.session_state.cart[item_id] == 0:
-                del st.session_state.cart[item_id]
+if 'remove' in params:
+    item_id = params.get('remove')[0]
+    # Remove from cart
+    if item_id in st.session_state.cart and st.session_state.cart[item_id] > 0:
+        st.session_state.cart[item_id] -= 1
+        if st.session_state.cart[item_id] == 0:
+            del st.session_state.cart[item_id]
+    # Clear parameter
+    del st.query_params['remove']
+    st.rerun()
 
+# Helper functions
 def get_item_quantity(item_id):
     """Get the quantity of an item in the cart"""
     return st.session_state.cart.get(item_id, 0)
@@ -307,7 +346,10 @@ with col2:
     
     with tab1:  # Display all items in the All tab
         for i, item in enumerate(menu_items):
-            cols = st.columns([1, 3, 1])
+            container = st.container()
+            
+            # Item layout with columns
+            cols = container.columns([1, 3, 1])
             
             with cols[0]:
                 st.image(item["image"], width=100)
@@ -316,27 +358,25 @@ with col2:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
             
-            # SIMPLIFIED approach for quantity controls
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
                 # Display current quantity
                 st.write(f"Quantity: {quantity}")
                 
-                # MANUAL HTML approach for +/- buttons
+                # Get a unique ID for this item container
+                item_container_id = f"item_{item['id']}"
+                
+                # Add direct links for buttons that work exactly where they appear
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px;">
-                    <button class="plus-minus-btn" onclick="document.getElementById('minus_btn_{i}').click()">-</button>
-                    <span class="quantity-display">{quantity}</span>
-                    <button class="plus-minus-btn" onclick="document.getElementById('plus_btn_{i}').click()">+</button>
+                <div style="position: relative; height: 40px; margin-top: 10px;">
+                    <!-- These buttons are actual links that trigger URL parameters -->
+                    <a href="?remove={item['id']}" style="text-decoration: none;">
+                        <div class="visible-button minus-btn">-</div>
+                    </a>
+                    <div class="quantity-value">{quantity}</div>
+                    <a href="?add={item['id']}" style="text-decoration: none;">
+                        <div class="visible-button plus-btn">+</div>
+                    </a>
                 </div>
                 """, unsafe_allow_html=True)
-                
-                # Hidden buttons that will be triggered by the HTML buttons
-                if st.button("-", key=f"minus_btn_{i}", help="Decrease quantity"):
-                    remove_from_cart(item["id"])
-                    st.rerun()
-                
-                if st.button("+", key=f"plus_btn_{i}", help="Increase quantity"):
-                    add_to_cart(item["id"])
-                    st.rerun()
