@@ -57,8 +57,8 @@ st.markdown("""
     
     /* Cart icon styling - Fixed at TOP right corner */
     .cart-icon {
-        position: absolute;
-        top: 20px; /* Move to top */
+        position: fixed;
+        top: 20px; /* Positioned at the top */
         right: 30px;
         z-index: 1000;
     }
@@ -80,26 +80,15 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Menu quantity buttons */
-    .quantity-btn {
-        display: inline-block;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        background-color: white;
-        color: #333;
-        font-weight: bold;
-        text-align: center;
-        line-height: 30px;
-        cursor: pointer;
-        margin: 0 5px;
-    }
-    
-    .quantity-value {
-        display: inline-block;
-        width: 30px;
-        text-align: center;
+    /* Button styling */
+    .stButton button {
+        border-radius: 50% !important;
+        width: 30px !important;
+        height: 30px !important;
+        padding: 0 !important;
+        background-color: white !important;
+        color: #333 !important;
+        border: 1px solid #ccc !important;
     }
     
     /* Hide Streamlit elements */
@@ -276,7 +265,7 @@ with col2:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["All", "Main Dishes", "Soup", "Appetizers", "Drinks"])
     
     with tab1:  # Display all items in the All tab
-        for item in menu_items:
+        for i, item in enumerate(menu_items):
             cols = st.columns([1, 3, 1])
             
             with cols[0]:
@@ -286,42 +275,33 @@ with col2:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
             
-            # Quantity controls
+            # SIMPLIFIED quantity controls - NO FORMS, NO NESTED COLUMNS
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
                 # Display current quantity
                 st.write(f"Quantity: {quantity}")
                 
-                # Use image buttons instead of interactive elements
-                # Generate unique form ID to enable multiple forms on the same page
-                form_id = f"form_{item['id']}"
+                # Create simple buttons without forms or nested columns
+                # Just use regular buttons and handle clicks directly
+                st.write("") # Add some space
                 
-                # Create a form with buttons
-                with st.form(key=form_id, clear_on_submit=False):
-                    st.markdown(f"""
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <div class="quantity-btn">-</div>
-                        <div class="quantity-value">{quantity}</div>
-                        <div class="quantity-btn">+</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    # These buttons are hidden but functional
-                    cols = st.columns(2)
-                    with cols[0]:
-                        minus_btn = st.form_submit_button("-", help="Decrease quantity")
-                    with cols[1]:
-                        plus_btn = st.form_submit_button("+", help="Increase quantity")
-                    
-                    # Handle button clicks
-                    if minus_btn:
-                        remove_from_cart(item["id"])
-                        st.rerun()
-                    
-                    if plus_btn:
-                        add_to_cart(item["id"])
-                        st.rerun()
+                # Use simple text with the quantity between buttons
+                st.markdown(f"""
+                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 5px;">
+                    <span>{quantity}</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Add a minus button using session state to track item ID
+                if st.button("-", key=f"minus_{i}"):
+                    remove_from_cart(item["id"])
+                    st.rerun()
+                
+                # Add a plus button using session state to track item ID  
+                if st.button("+", key=f"plus_{i}"):
+                    add_to_cart(item["id"])
+                    st.rerun()
 
 # Cart icon with proper styling - positioned at the TOP right corner (fixed)
 cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
