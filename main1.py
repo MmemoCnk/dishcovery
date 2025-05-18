@@ -14,132 +14,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS with fixes for quantity buttons and cart icon
+# Very minimal CSS - focused only on the essentials
 st.markdown("""
 <style>
-    /* Main container styles */
-    .main {
-        padding: 0 !important;
-    }
-    
-    /* Header styles */
-    .dishcovery-header {
-        background-color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #e0e0e0;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    
-    .dishcovery-title {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #333;
-    }
-    
-    .welcome-banner {
-        background-color: #e17a54;
-        color: white;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-bottom: 1rem;
-    }
-    
-    /* Menu content */
-    .menu-content {
-        padding: 1rem;
-    }
-    
-    /* Category tabs */
-    .category-tab {
-        background-color: #f3f4f6;
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-        margin-right: 0.5rem;
-        cursor: pointer;
-        display: inline-block;
-        font-size: 0.9rem;
-    }
-    
-    .category-tab.active {
-        background-color: #e17a54;
-        color: white;
-    }
-    
-    /* Menu card */
-    .menu-card {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        background-color: white;
-        display: flex;
-        align-items: center;
-        transition: box-shadow 0.3s;
-    }
-    
-    .menu-card:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    .food-img {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-right: 1rem;
-    }
-    
-    /* FIX 1: Improved Quantity buttons styling */
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        margin-top: 10px;
-    }
-    
-    .quantity-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: 1px solid #e0e0e0;
-        background-color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 18px;
-        font-weight: bold;
-        transition: all 0.2s;
-    }
-    
-    .quantity-btn:hover {
-        background-color: #f8f9fa;
-    }
-    
-    .quantity-display {
-        width: 36px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 16px;
-    }
-    
-    .btn-minus {
-        color: #666;
-        border-color: #e0e0e0;
-    }
-    
-    .btn-plus {
-        color: #e17a54;
-        border-color: #e17a54;
-    }
-    
-    /* FIX 2: Improved cart icon and button */
+    /* Cart button styling */
     .cart-button {
         position: fixed;
         top: 20px;
@@ -156,59 +34,9 @@ st.markdown("""
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         border: none;
-        transition: transform 0.2s;
     }
     
-    .cart-button:hover {
-        transform: scale(1.05);
-    }
-    
-    /* Toast notification */
-    .toast {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: #4caf50;
-        color: white;
-        padding: 1rem;
-        border-radius: 5px;
-        z-index: 1000;
-        display: none;
-    }
-    
-    /* Customer info section */
-    .customer-info {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    
-    /* Member login section */
-    .member-login {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    
-    /* Footer */
-    .footer {
-        text-align: center;
-        padding: 1rem;
-        color: #6c757d;
-        font-size: 0.8rem;
-        border-top: 1px solid #e0e0e0;
-        margin-top: 2rem;
-    }
-    
-    /* Item name styling */
-    .item-name {
-        font-weight: bold;
-        margin-bottom: 0.25rem;
-    }
-    
-    /* Cart button counter */
+    /* Cart counter */
     .cart-counter {
         position: absolute;
         top: -8px;
@@ -225,57 +53,29 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Custom button */
-    .custom-button {
-        background-color: #e17a54;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-    }
-    
-    .custom-button:hover {
-        background-color: #d1694a;
-    }
-    
     /* Hide Streamlit elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* Section headers */
-    .section-header {
-        font-size: 1.2rem;
+    /* IMPORTANT: Style for our quantity controls - minimal and focused on functionality */
+    .quantity-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .quantity-btn {
+        font-size: 18px;
         font-weight: bold;
-        color: #555;
-        margin: 1rem 0;
-        padding: 0.5rem;
-        background-color: #f8f9fa;
-        border-radius: 5px;
     }
     
-    /* Side panel sections */
-    .side-panel-section {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    /* Dialog styles */
-    .stAlert > div {
-        padding: 1rem;
-        border-radius: 8px;
-    }
-    
-    /* Hide streamlit's default button styling for our custom buttons */
-    .control-button-row button {
-        visibility: hidden;
-        height: 0;
-        padding: 0 !important;
-        margin: 0 !important;
-        line-height: 0 !important;
+    .quantity-display {
+        font-weight: bold;
+        min-width: 30px;
+        text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -283,36 +83,12 @@ st.markdown("""
 # Initialize session state
 if 'cart' not in st.session_state:
     st.session_state.cart = []
-if 'is_authenticated' not in st.session_state:
-    st.session_state.is_authenticated = False
-if 'user_data' not in st.session_state:
-    st.session_state.user_data = None
 if 'active_category' not in st.session_state:
     st.session_state.active_category = "all"
 if 'search_query' not in st.session_state:
     st.session_state.search_query = ""
-if 'show_food_dialog' not in st.session_state:
-    st.session_state.show_food_dialog = False
-if 'selected_food' not in st.session_state:
-    st.session_state.selected_food = None
-if 'show_cart' not in st.session_state:
-    st.session_state.show_cart = False
-if 'order_sent' not in st.session_state:
-    st.session_state.order_sent = False
-if 'show_toast' not in st.session_state:
-    st.session_state.show_toast = False
-if 'toast_message' not in st.session_state:
-    st.session_state.toast_message = ""
 
-# Sample data
-categories = [
-    {"id": "all", "name": "All"},
-    {"id": "main", "name": "Main Dishes"},
-    {"id": "appetizers", "name": "Appetizers"},
-    {"id": "desserts", "name": "Desserts"},
-    {"id": "drinks", "name": "Drinks"}
-]
-
+# Sample data - just for demo
 menu_items = [
     {
         "id": "1",
@@ -337,46 +113,6 @@ menu_items = [
         "image": "https://images.unsplash.com/photo-1604579278540-db35e0495aea",
         "categoryId": "main",
         "description": "Rich and creamy Thai green curry with eggplant, bamboo shoots, and basil."
-    },
-    {
-        "id": "4",
-        "name": "Mango Sticky Rice",
-        "price": 90,
-        "image": "https://images.unsplash.com/photo-1621304813372-016faff0efdd",
-        "categoryId": "desserts",
-        "description": "Sweet sticky rice soaked in coconut milk, served with fresh mango."
-    },
-    {
-        "id": "5",
-        "name": "Thai Iced Tea",
-        "price": 60,
-        "image": "https://images.unsplash.com/photo-1563461661026-49631dd5d68e",
-        "categoryId": "drinks",
-        "description": "Sweet Thai tea with milk, served over ice."
-    },
-    {
-        "id": "6",
-        "name": "Stir Fried Thai Basil",
-        "price": 140,
-        "image": "https://images.unsplash.com/photo-1625398407796-82650a8c9dd4",
-        "categoryId": "main",
-        "description": "Stir-fried meat with Thai basil, chili, and garlic."
-    },
-    {
-        "id": "7",
-        "name": "Fresh Water",
-        "price": 20,
-        "image": "https://images.unsplash.com/photo-1616118132534-731f94e918c8",
-        "categoryId": "drinks",
-        "description": "Refreshing bottled water."
-    },
-    {
-        "id": "8",
-        "name": "Rice",
-        "price": 25,
-        "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99",
-        "categoryId": "main",
-        "description": "Steamed jasmine rice, a perfect side for Thai dishes."
     }
 ]
 
@@ -388,15 +124,18 @@ def get_item_quantity(item_id):
             return item["quantity"]
     return 0
 
-def add_to_cart(item, remark=None):
+def add_to_cart(item_id):
     """Add an item to the cart"""
+    # Find the item
+    item = next((item for item in menu_items if item["id"] == item_id), None)
+    if not item:
+        return
+    
     # Check if item already exists in cart
     for i, cart_item in enumerate(st.session_state.cart):
-        if cart_item["id"] == item["id"]:
+        if cart_item["id"] == item_id:
             # Update quantity
             st.session_state.cart[i]["quantity"] += 1
-            if remark:
-                st.session_state.cart[i]["remark"] = remark
             return
     
     # Add new item to cart
@@ -405,435 +144,98 @@ def add_to_cart(item, remark=None):
         "name": item["name"],
         "price": item["price"],
         "image": item["image"],
-        "quantity": 1,
-        "remark": remark
+        "quantity": 1
     }
     st.session_state.cart.append(cart_item)
 
-def update_cart_quantity(item_id, quantity):
-    """Update the quantity of an item in the cart"""
-    for i, item in enumerate(st.session_state.cart):
-        if item["id"] == item_id:
-            if quantity <= 0:
+def remove_from_cart(item_id):
+    """Remove one unit of an item from the cart"""
+    for i, cart_item in enumerate(st.session_state.cart):
+        if cart_item["id"] == item_id:
+            if cart_item["quantity"] > 1:
+                # Decrease quantity
+                st.session_state.cart[i]["quantity"] -= 1
+            else:
                 # Remove item from cart
                 st.session_state.cart.pop(i)
-            else:
-                # Update quantity
-                st.session_state.cart[i]["quantity"] = quantity
-            return
-
-def remove_from_cart(item_id):
-    """Remove an item from the cart"""
-    for i, item in enumerate(st.session_state.cart):
-        if item["id"] == item_id:
-            st.session_state.cart.pop(i)
             return
 
 def get_total_items():
     """Get the total number of items in the cart"""
     return sum(item["quantity"] for item in st.session_state.cart)
 
-def get_total_price():
-    """Get the total price of items in the cart"""
-    return sum(item["price"] * item["quantity"] for item in st.session_state.cart)
-
-def filter_menu_items():
-    """Filter menu items based on active category and search query"""
-    filtered = menu_items
-    
-    # Filter by category
-    if st.session_state.active_category != "all":
-        filtered = [item for item in filtered if item["categoryId"] == st.session_state.active_category]
-    
-    # Filter by search query
-    if st.session_state.search_query:
-        query = st.session_state.search_query.lower()
-        filtered = [item for item in filtered if query in item["name"].lower()]
-    
-    return filtered
-
-# Layout the app
+# Layout the app in two columns
 col1, col2 = st.columns([1, 3])
 
 with col1:
-    # DISHCOVERY title
-    st.markdown('<h1 class="dishcovery-title">DISHCOVERY</h1>', unsafe_allow_html=True)
+    st.markdown('<h1>DISHCOVERY</h1>', unsafe_allow_html=True)
     
-    # Member login section
-    st.markdown('<div class="side-panel-section">', unsafe_allow_html=True)
-    st.write("Please Input Customer ID")
-    
-    member_id = st.text_input("Member ID", key="member_id_input")
-    phone = st.text_input("Tel number", key="phone_input")
+    # Simplified left sidebar content
+    st.markdown('## Customer Login')
+    st.text_input("Member ID")
+    st.text_input("Tel number")
     
     if st.button("Enter"):
-        # Simulate authentication
-        st.session_state.is_authenticated = True
-        st.session_state.user_data = {
-            "firstName": "Test",
-            "lastName": "User",
-            "phone": phone,
-            "allergies": ["Peanuts", "Shellfish"],
-            "favorites": ["Pad Thai", "Green Curry"]
-        }
-        st.experimental_rerun()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Customer information (shown only when authenticated)
-    if st.session_state.is_authenticated and st.session_state.user_data:
-        st.markdown('<div class="side-panel-section">', unsafe_allow_html=True)
-        st.write("Customer Information")
-        st.text_input("Name:", value=st.session_state.user_data["firstName"], disabled=True)
-        st.text_input("Surname:", value=st.session_state.user_data["lastName"], disabled=True)
-        current_date = datetime.now().strftime("%A, %B %d, %Y, %H:%M")
-        st.write(f"Date & Time: {current_date}")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Favorite Dishes section
-        st.markdown('''
-        <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                Favorite Dishes
-            </div>
-            <div style="background-color: white; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Pad Thai
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Green Curry
-                </div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        # Recommendation section
-        st.markdown('''
-        <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                Recommendation
-            </div>
-            <div style="background-color: white; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Omelette (new)</span>
-                    <span style="color: green;">100</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Fries Pork with Garlic</span>
-                    <span style="color: green;">99</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Som Tam</span>
-                    <span style="color: green;">80</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>Satay</span>
-                    <span style="color: green;">30</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>test1</span>
-                    <span style="color: green;">30</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 5px 0;">
-                    <span>test2</span>
-                    <span style="color: green;">30</span>
-                </div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        # Allergic Food section
-        st.markdown('''
-        <div style="background-color: #e17a54; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <div style="background-color: rgba(255, 255, 255, 0.3); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; font-size: 24px; font-weight: bold;">
-                Allergic Food
-            </div>
-            <div style="background-color: white; border-radius: 10px; padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Peanuts
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span style="margin-right: 10px;">•</span> Shellfish
-                </div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+        st.success("Login successful!")
 
 with col2:
     # Welcome banner
-    if st.session_state.is_authenticated and st.session_state.user_data:
-        welcome_text = f"Welcome {st.session_state.user_data['firstName']} {st.session_state.user_data['lastName']}"
-    else:
-        welcome_text = "Welcome"
-    st.markdown(f'<div class="welcome-banner">{welcome_text}</div>', unsafe_allow_html=True)
+    st.markdown('<div style="background-color: #e17a54; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">Welcome</div>', unsafe_allow_html=True)
     
     # Main Menu header
-    st.markdown('<h2>Main Menu</h2>', unsafe_allow_html=True)
+    st.markdown('## Main Menu')
     
     # Search bar
-    search_query = st.text_input("", placeholder="Search menu...", value=st.session_state.search_query)
-    if search_query != st.session_state.search_query:
-        st.session_state.search_query = search_query
-        st.experimental_rerun()
+    st.text_input("", placeholder="Search menu...")
     
-    # Category tabs with less spacing
-    st.markdown('<div class="category-container" style="display: flex; gap: 5px; margin-bottom: 1rem;">', unsafe_allow_html=True)
-    cols = st.columns(len(categories))
-    for i, category in enumerate(categories):
-        with cols[i]:
-            if st.button(category["name"], key=f"category_{category['id']}", help=category["name"]):
-                st.session_state.active_category = category["id"]
-                st.experimental_rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Category tabs
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["All", "Main Dishes", "Appetizers", "Desserts", "Drinks"])
     
-    # Filter menu items
-    filtered_items = filter_menu_items()
-    
-    # Display menu items with FIXED quantity controls
-    for item in filtered_items:
-        menu_card = st.container()
-        with menu_card:
-            cols = st.columns([1, 3, 1])
-            
-            with cols[0]:
-                st.image(item["image"], width=100)
-            
-            with cols[1]:
-                st.write(f"### {item['name']}")
-                st.write(f"฿{item['price']}")
-                st.write(item["description"])
-            
-            # FIX 1: Improved quantity controls layout
-            with cols[2]:
-                quantity = get_item_quantity(item["id"])
+    with tab1:
+        # Display menu items with SIMPLE, FUNCTIONAL quantity controls
+        for item in menu_items:
+            with st.container():
+                cols = st.columns([1, 3, 1])
                 
-                # Create hidden buttons for +/- functionality
-                control_buttons = st.empty()
-                with control_buttons.container():
-                    btn_cols = st.columns([1, 1])
-                    with btn_cols[0]:
-                        minus_clicked = st.button("-", key=f"minus_{item['id']}")
-                    with btn_cols[1]:
-                        plus_clicked = st.button("+", key=f"plus_{item['id']}")
+                with cols[0]:
+                    st.image(item["image"], width=100)
                 
-                # Custom HTML for better styling of quantity controls
-                st.markdown(f"""
-                <div class="control-button-row" style="display: none;">
-                    <!-- This is where the streamlit buttons are -->
-                </div>
+                with cols[1]:
+                    st.write(f"### {item['name']}")
+                    st.write(f"฿{item['price']}")
+                    st.write(item["description"])
                 
-                <div class="quantity-controls">
-                    <button class="quantity-btn btn-minus" 
-                        onclick="document.querySelector('button[key=minus_{item['id']}]').click();">
-                        -
-                    </button>
-                    <div class="quantity-display">{quantity}</div>
-                    <button class="quantity-btn btn-plus"
-                        onclick="document.querySelector('button[key=plus_{item['id']}]').click();">
-                        +
-                    </button>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Handle button clicks
-                if minus_clicked and quantity > 0:
-                    update_cart_quantity(item["id"], quantity - 1)
-                    st.experimental_rerun()
-                
-                if plus_clicked:
-                    add_to_cart(item)
-                    st.experimental_rerun()
+                # SOLUTION: Simple, direct quantity controls without complex HTML/CSS
+                with cols[2]:
+                    quantity = get_item_quantity(item["id"])
+                    
+                    # Create a row of controls using st.columns for layout
+                    st.write(f"**Quantity:** {quantity}")
+                    
+                    # Create two equal columns for the + and - buttons
+                    minus_col, plus_col = st.columns(2)
+                    
+                    with minus_col:
+                        if st.button("-", key=f"minus_{item['id']}"):
+                            if quantity > 0:
+                                remove_from_cart(item["id"])
+                                st.experimental_rerun()
+                    
+                    with plus_col:
+                        if st.button("+", key=f"plus_{item['id']}"):
+                            add_to_cart(item["id"])
+                            st.experimental_rerun()
 
-# FIX 2: Improved cart button with clearer icon
+# Cart button
 cart_count = get_total_items()
-cart_button_html = f"""
-<button class="cart-button" onclick="document.getElementById('cart-dialog').style.display='block'">
-    <div style="position: relative;">
-        <!-- Shopping Cart Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
-    </div>
+cart_html = f"""
+<button class="cart-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+    </svg>
+    {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
 </button>
 """
-st.markdown(cart_button_html, unsafe_allow_html=True)
-
-# Shopping cart dialog
-cart_dialog_html = f"""
-<div id="cart-dialog" style="display: none; position: fixed; top: 0; right: 0; width: 100%; max-width: 400px; height: 100%; background: white; box-shadow: -2px 0 5px rgba(0,0,0,0.1); z-index: 1001; overflow-y: auto; padding: 1rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding-bottom: 1rem; margin-bottom: 1rem;">
-        <h2>Shopping Cart</h2>
-        <button onclick="document.getElementById('cart-dialog').style.display='none'" style="background: none; border: none; cursor: pointer;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </button>
-    </div>
-"""
-
-if len(st.session_state.cart) == 0:
-    cart_dialog_html += """
-    <div style="text-align: center; padding: 2rem;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #ccc;">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        <p style="color: #666;">Your cart is empty</p>
-    </div>
-    """
-else:
-    for item in st.session_state.cart:
-        cart_dialog_html += f"""
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
-            <div style="display: flex; align-items: center;">
-                <img src="{item['image']}" alt="{item['name']}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 0.5rem;">
-                <div>
-                    <div style="font-weight: bold;">{item['name']}</div>
-                    <div style="font-size: 0.8rem; color: #666;">฿{item['price']} × {item['quantity']} = ฿{item['price'] * item['quantity']}</div>
-                    {f'<div style="font-size: 0.8rem; color: #666; font-style: italic;">{item["remark"]}</div>' if item.get('remark') else ''}
-                </div>
-            </div>
-            <button onclick="updateCartItem('{item['id']}', 'remove')" style="background: none; border: none; color: #e74c3c; cursor: pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                </svg>
-            </button>
-        </div>
-        """
-
-# Add total and checkout button
-if len(st.session_state.cart) > 0:
-    total_price = get_total_price()
-    checkout_button_disabled = "disabled" if st.session_state.order_sent else ""
-    checkout_button_text = "Order sent to kitchen!" if st.session_state.order_sent else "Checkout"
-    
-    cart_dialog_html += f"""
-    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem;">
-            <span>Total</span>
-            <span>฿{total_price}</span>
-        </div>
-        <button onclick="checkoutCart()" {checkout_button_disabled} 
-            style="width: 100%; padding: 0.75rem; background-color: #e17a54; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-            {checkout_button_text}
-        </button>
-    </div>
-    """
-
-cart_dialog_html += """
-</div>
-"""
-
-# Add JavaScript for cart functionality
-js_code = """
-<script>
-    function updateCartItem(itemId, action) {
-        // Send message to Streamlit
-        const data = {
-            itemId: itemId,
-            action: action
-        };
-        window.parent.postMessage({type: "cart_action", data: JSON.stringify(data)}, "*");
-    }
-    
-    function checkoutCart() {
-        // Send message to Streamlit
-        window.parent.postMessage({type: "checkout"}, "*");
-    }
-    
-    // Listen for messages from Streamlit
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'cart_updated') {
-            // Refresh page to update cart
-            window.location.reload();
-        }
-        if (event.data.type === 'order_sent') {
-            // Show order sent message
-            document.getElementById('checkout-button').innerText = "Order sent to kitchen!";
-            document.getElementById('checkout-button').disabled = true;
-            
-            // Show toast
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = "Order sent to kitchen!";
-            toast.style.display = 'block';
-            document.body.appendChild(toast);
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.style.display = 'none';
-                // Close cart dialog
-                document.getElementById('cart-dialog').style.display = 'none';
-                // Refresh page to update cart
-                window.location.reload();
-            }, 3000);
-        }
-    });
-</script>
-"""
-
-# Append JavaScript to the page
-st.markdown(cart_dialog_html + js_code, unsafe_allow_html=True)
-
-# Handle shopping cart actions from JavaScript
-if 'cart_action' in st.query_params:
-    action_data = json.loads(st.query_params['cart_action'][0])
-    item_id = action_data['itemId']
-    action = action_data['action']
-    
-    if action == 'remove':
-        remove_from_cart(item_id)
-        st.experimental_rerun()
-
-# Handle checkout from JavaScript
-if 'checkout' in st.query_params:
-    checkout()
-    st.experimental_rerun()
-
-# Toast notification
-if st.session_state.show_toast:
-    toast_html = f"""
-    <div id="toast" class="toast" style="display: block;">{st.session_state.toast_message}</div>
-    <script>
-        setTimeout(function() {{
-            document.getElementById('toast').style.display = 'none';
-        }}, 3000);
-    </script>
-    """
-    st.markdown(toast_html, unsafe_allow_html=True)
-    st.session_state.show_toast = False
-
-# Footer
-st.markdown('<div class="footer">© 2024 DISHCOVERY. All rights reserved.</div>', unsafe_allow_html=True)
-
-# Add additional JS for improving button interactions
-additional_js = """
-<script>
-// Function to handle clicks for quantity buttons
-document.addEventListener('DOMContentLoaded', function() {
-    // This ensures all our custom buttons work properly
-    // by redirecting clicks to the Streamlit buttons
-    
-    // For menu card click to view details
-    const menuCards = document.querySelectorAll('.menu-card');
-    menuCards.forEach(card => {
-        card.addEventListener('click', function(e) {
-            // Prevent triggering when clicking buttons
-            if (!e.target.closest('button')) {
-                const foodId = card.getAttribute('data-food-id');
-                window.parent.postMessage({type: "open_food_dialog", foodId: foodId}, "*");
-            }
-        });
-    });
-});
-</script>
-"""
-
-st.markdown(additional_js, unsafe_allow_html=True)
+st.markdown(cart_html, unsafe_allow_html=True)
