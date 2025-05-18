@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for styling
+# Custom CSS with VERY SPECIFIC fixes for the buttons and cart
 st.markdown("""
 <style>
     /* DISHCOVERY title */
@@ -55,12 +55,23 @@ st.markdown("""
         padding: 15px;
     }
     
-    /* Cart icon styling - Fixed at TOP right corner */
-    .cart-icon {
-        position: fixed;
-        top: 20px; /* Positioned at the top */
-        right: 30px;
-        z-index: 1000;
+    /* Shopping cart fixed element */
+    .cart-fixed {
+        position: fixed !important;
+        top: 80px !important;
+        right: 40px !important;
+        z-index: 9999 !important;
+    }
+    
+    /* Shopping cart SVG icon */
+    .cart-icon svg {
+        width: 40px;
+        height: 40px;
+        fill: none;
+        stroke: black;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
     
     /* Cart counter */
@@ -80,15 +91,26 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Button styling */
-    .stButton button {
-        border-radius: 50% !important;
+    /* FORCE button styling for +/- */
+    button.plus-minus-btn {
+        display: inline-block !important;
         width: 30px !important;
         height: 30px !important;
-        padding: 0 !important;
+        border-radius: 50% !important;
+        border: 1px solid #ccc !important;
         background-color: white !important;
         color: #333 !important;
-        border: 1px solid #ccc !important;
+        font-weight: bold !important;
+        padding: 0 !important;
+        margin: 0 5px !important;
+        cursor: pointer !important;
+    }
+    
+    /* Force quantity display styling */
+    .quantity-display {
+        display: inline-block;
+        width: 30px;
+        text-align: center;
     }
     
     /* Hide Streamlit elements */
@@ -160,6 +182,25 @@ menu_items = [
         "category": "main"
     }
 ]
+
+# Cart icon at the TOP-RIGHT (OUTSIDE columns layout)
+cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
+
+# Shopping cart icon - placed directly at the top level before any columns
+st.markdown(f"""
+<div class="cart-fixed">
+    <div style="position: relative;">
+        <div class="cart-icon">
+            <svg viewBox="0 0 24 24">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+        </div>
+        {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # Layout the app
 col1, col2 = st.columns([1, 3])
@@ -275,48 +316,27 @@ with col2:
                 st.write(f"### {item['name']}")
                 st.write(f"฿{item['price']}")
             
-            # SIMPLIFIED quantity controls - NO FORMS, NO NESTED COLUMNS
+            # SIMPLIFIED approach for quantity controls
             with cols[2]:
                 quantity = get_item_quantity(item["id"])
                 
                 # Display current quantity
                 st.write(f"Quantity: {quantity}")
                 
-                # Create simple buttons without forms or nested columns
-                # Just use regular buttons and handle clicks directly
-                st.write("") # Add some space
-                
-                # Use simple text with the quantity between buttons
+                # MANUAL HTML approach for +/- buttons
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 5px;">
-                    <span>{quantity}</span>
+                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px;">
+                    <button class="plus-minus-btn" onclick="document.getElementById('minus_btn_{i}').click()">-</button>
+                    <span class="quantity-display">{quantity}</span>
+                    <button class="plus-minus-btn" onclick="document.getElementById('plus_btn_{i}').click()">+</button>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Add a minus button using session state to track item ID
-                if st.button("-", key=f"minus_{i}"):
+                # Hidden buttons that will be triggered by the HTML buttons
+                if st.button("-", key=f"minus_btn_{i}", help="Decrease quantity"):
                     remove_from_cart(item["id"])
                     st.rerun()
                 
-                # Add a plus button using session state to track item ID  
-                if st.button("+", key=f"plus_{i}"):
+                if st.button("+", key=f"plus_btn_{i}", help="Increase quantity"):
                     add_to_cart(item["id"])
                     st.rerun()
-
-# Cart icon with proper styling - positioned at the TOP right corner (fixed)
-cart_count = sum(st.session_state.cart.values()) if st.session_state.cart else 0
-
-# Cart icon with proper styling and counter
-cart_html = f"""
-<div class="cart-icon">
-    <div style="position: relative;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        {f'<span class="cart-counter">{cart_count}</span>' if cart_count > 0 else ''}
-    </div>
-</div>
-"""
-st.markdown(cart_html, unsafe_allow_html=True)
